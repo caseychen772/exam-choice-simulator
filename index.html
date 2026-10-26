@@ -1,0 +1,605 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>基北免試 × 五專優免 ｜ 落點選填模擬器</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F6F0E4; --paper2:#EFE7D6; --card:#FFFDF8; --ink:#221E18; --ink2:#5C544A;
+  --line:#E2D7C2; --line2:#D2C4A9;
+  --accent:#0E7C66; --accent-d:#0a5b4a; --coral:#DC5B38; --gold:#C2902B;
+  --safe:#1F9D6B; --steady:#2C7FB8; --reach:#C98A14; --dream:#C74E63;
+  --safe-bg:#E5F4EC; --steady-bg:#E4EFF7; --reach-bg:#F8EFD8; --dream-bg:#F7E5E9;
+  --shadow:0 1px 2px rgba(60,45,20,.06),0 8px 26px rgba(60,45,20,.08);
+  --r:16px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:"Noto Sans TC",sans-serif; color:var(--ink);
+  background:
+    radial-gradient(1200px 600px at 85% -8%, #fff6e3 0%, transparent 55%),
+    radial-gradient(900px 500px at -5% 8%, #e9f3ee 0%, transparent 50%),
+    var(--paper);
+  -webkit-font-smoothing:antialiased; line-height:1.55;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:0 18px 90px}
+.serif{font-family:"Noto Serif TC",serif}
+.mono{font-family:"DM Mono",monospace;font-feature-settings:"tnum"}
+
+/* ---------- header ---------- */
+header{padding:30px 0 8px;position:relative}
+.kicker{font-size:13px;letter-spacing:.22em;color:var(--accent);font-weight:700;display:flex;gap:8px;align-items:center}
+.kicker .dot{width:6px;height:6px;border-radius:50%;background:var(--coral);box-shadow:0 0 0 3px rgba(220,91,56,.18)}
+h1{font-family:"Noto Serif TC",serif;font-weight:900;font-size:clamp(28px,5vw,46px);line-height:1.08;margin:8px 0 6px;letter-spacing:-.01em}
+h1 .x{color:var(--coral);font-style:normal;padding:0 .12em}
+.lede{color:var(--ink2);max-width:640px;font-size:15px}
+.lede b{color:var(--ink)}
+
+/* ---------- sticky score bar ---------- */
+.scorebar{position:sticky;top:0;z-index:40;margin-top:18px;
+  background:rgba(255,253,248,.86);backdrop-filter:blur(10px);
+  border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);
+  display:flex;gap:14px;align-items:center;padding:12px 16px;flex-wrap:wrap}
+.scorebar .sb-num{font-family:"DM Mono",monospace;font-weight:500;font-size:34px;line-height:1;color:var(--accent)}
+.scorebar .sb-num.dim{color:var(--line2)}
+.scorebar .sb-lab{font-size:12px;color:var(--ink2);letter-spacing:.04em}
+.scorebar .sb-unit{font-size:13px;color:var(--ink2);font-family:"DM Mono",monospace}
+.sb-block{display:flex;flex-direction:column;gap:2px;padding-right:16px;border-right:1px dashed var(--line2)}
+.sb-block:last-of-type{border-right:none}
+.sb-spacer{flex:1}
+.sb-hint{font-size:12px;color:var(--ink2)}
+.sb-hint b{color:var(--coral)}
+
+/* ---------- panels ---------- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.sec-title{font-family:"Noto Serif TC",serif;font-weight:700;font-size:20px;display:flex;align-items:center;gap:10px;margin:0}
+.step-no{font-family:"DM Mono",monospace;font-size:13px;color:#fff;background:var(--ink);width:26px;height:26px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
+.muted{color:var(--ink2);font-size:13px}
+
+/* grade input */
+.grades{padding:20px;margin-top:22px}
+.ghead{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.grow{display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:center;padding:9px 0;border-top:1px dashed var(--line)}
+.grow:first-of-type{border-top:none}
+.glab{font-weight:700;font-size:15px}
+.glab small{display:block;font-weight:400;color:var(--ink2);font-size:11px}
+.segs{display:flex;gap:6px;flex-wrap:wrap}
+.seg{border:1.5px solid var(--line2);background:#fff;color:var(--ink2);border-radius:10px;
+  padding:7px 0;width:46px;text-align:center;font-family:"DM Mono",monospace;font-weight:500;font-size:14px;
+  cursor:pointer;transition:.13s;user-select:none}
+.seg:hover{border-color:var(--accent);color:var(--accent)}
+.seg.on{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 4px 12px rgba(14,124,102,.28);transform:translateY(-1px)}
+.seg.w{width:38px}
+.seg.on.w{background:var(--coral);border-color:var(--coral);box-shadow:0 4px 12px rgba(220,91,56,.28)}
+.gactions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.btn{border:none;border-radius:11px;padding:10px 16px;font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;transition:.15s}
+.btn.ghost{background:transparent;border:1.5px solid var(--line2);color:var(--ink2)}
+.btn.ghost:hover{border-color:var(--coral);color:var(--coral)}
+.btn.fill{background:var(--ink);color:#fff}
+.btn.fill:hover{background:#000}
+
+/* tabs */
+.tabs{display:flex;gap:8px;margin:26px 0 0}
+.tab{border:1px solid var(--line);background:var(--paper2);border-bottom:none;border-radius:14px 14px 0 0;
+  padding:11px 18px;font-weight:700;font-size:15px;cursor:pointer;color:var(--ink2);transition:.15s;position:relative;top:1px}
+.tab .small{font-weight:400;font-size:11px;display:block;color:var(--ink2)}
+.tab.on{background:var(--card);color:var(--ink);box-shadow:0 -3px 10px rgba(60,45,20,.05)}
+.tab.on .small{color:var(--accent)}
+
+/* main two-pane */
+.main{display:grid;grid-template-columns:1fr 360px;gap:18px;align-items:start;margin-top:0}
+.pane-l{background:var(--card);border:1px solid var(--line);border-radius:0 var(--r) var(--r) var(--r);box-shadow:var(--shadow);overflow:hidden}
+.filters{display:flex;gap:8px;padding:14px 16px;flex-wrap:wrap;border-bottom:1px solid var(--line);align-items:center}
+.search{flex:1;min-width:140px;border:1.5px solid var(--line2);border-radius:10px;padding:8px 12px;font-family:inherit;font-size:14px;background:#fff;color:var(--ink)}
+.search:focus{outline:none;border-color:var(--accent)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.fchip{border:1.5px solid var(--line2);background:#fff;border-radius:20px;padding:5px 12px;font-size:13px;cursor:pointer;color:var(--ink2);transition:.13s;white-space:nowrap}
+.fchip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.listhead{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;font-size:12px;color:var(--ink2);background:var(--paper2)}
+.list{max-height:560px;overflow-y:auto}
+.row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);transition:.12s;cursor:default}
+.row:hover{background:#fffaf0}
+.row .star{flex:0 0 auto;width:34px;height:34px;border-radius:9px;border:1.5px solid var(--line2);background:#fff;
+  cursor:pointer;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;transition:.13s;color:var(--line2)}
+.row .star:hover{border-color:var(--gold);color:var(--gold)}
+.row .star.added{background:var(--gold);border-color:var(--gold);color:#fff}
+.r-main{flex:1;min-width:0}
+.r-name{font-weight:700;font-size:15px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.r-name .dept{font-weight:400;color:var(--ink2);font-size:13px}
+.r-meta{display:flex;gap:6px;margin-top:3px;flex-wrap:wrap}
+.tag{font-size:11px;padding:1px 7px;border-radius:6px;background:var(--paper2);color:var(--ink2);border:1px solid var(--line)}
+.tag.pub{color:var(--accent);border-color:#bfe3d8;background:#eaf5f1}
+.tag.pri{color:var(--coral);border-color:#f3d3c8;background:#fbeee8}
+.r-right{flex:0 0 auto;text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.cut{font-family:"DM Mono",monospace;font-weight:500;font-size:20px;line-height:1}
+.cut .u{font-size:11px;color:var(--ink2)}
+.trend{font-size:11px;color:var(--ink2);font-family:"DM Mono",monospace}
+.stat{font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;white-space:nowrap}
+.stat.safe{background:var(--safe-bg);color:var(--safe)}
+.stat.steady{background:var(--steady-bg);color:var(--steady)}
+.stat.reach{background:var(--reach-bg);color:var(--reach)}
+.stat.dream{background:var(--dream-bg);color:var(--dream)}
+.stat.na{background:var(--paper2);color:var(--ink2)}
+.empty{padding:40px 16px;text-align:center;color:var(--ink2);font-size:14px}
+
+/* right pane: 志願表 */
+.pane-r{position:sticky;top:96px;display:flex;flex-direction:column;gap:14px}
+.vcard{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+.vhead{padding:14px 16px 12px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#fffaf0,transparent)}
+.vhead h3{margin:0;font-family:"Noto Serif TC",serif;font-size:18px;display:flex;align-items:center;gap:8px}
+.vhead .cnt{font-family:"DM Mono",monospace;color:var(--ink2);font-size:13px;font-weight:400}
+/* placement banner */
+.placement{margin:12px 16px;padding:14px;border-radius:13px;border:1.5px dashed var(--line2);background:var(--paper2)}
+.placement .pl-lab{font-size:12px;color:var(--ink2);letter-spacing:.05em}
+.placement .pl-name{font-family:"Noto Serif TC",serif;font-weight:700;font-size:19px;margin-top:3px}
+.placement.hit{border-color:var(--safe);background:var(--safe-bg)}
+.placement.hit .pl-name{color:var(--accent-d)}
+.placement.miss{border-color:var(--dream);background:var(--dream-bg)}
+.placement.miss .pl-name{color:var(--dream)}
+.placement .pl-sub{font-size:12px;color:var(--ink2);margin-top:5px}
+/* vlist */
+.vlist{padding:4px 10px 10px}
+.vitem{display:flex;align-items:center;gap:9px;padding:9px 6px;border-bottom:1px dashed var(--line)}
+.vitem:last-child{border-bottom:none}
+.vrank{font-family:"DM Mono",monospace;font-weight:500;width:26px;height:26px;border-radius:8px;background:var(--paper2);color:var(--ink2);display:flex;align-items:center;justify-content:center;font-size:13px;flex:0 0 auto}
+.vitem.placed .vrank{background:var(--accent);color:#fff}
+.vinfo{flex:1;min-width:0}
+.vinfo .vn{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vinfo .vd{font-size:11px;color:var(--ink2)}
+.vmove{display:flex;flex-direction:column;gap:2px}
+.vmove button{width:22px;height:16px;border:none;background:var(--paper2);border-radius:5px;cursor:pointer;color:var(--ink2);font-size:10px;line-height:1;padding:0}
+.vmove button:hover{background:var(--gold);color:#fff}
+.vdel{border:none;background:none;color:var(--line2);cursor:pointer;font-size:16px;padding:2px 4px}
+.vdel:hover{color:var(--dream)}
+.vstat{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
+.vempty{padding:30px 16px;text-align:center;color:var(--ink2);font-size:13px}
+/* diagnosis */
+.diag{padding:14px 16px;border-top:1px solid var(--line)}
+.diag-bar{display:flex;height:9px;border-radius:6px;overflow:hidden;background:var(--paper2);margin:8px 0 10px}
+.diag-bar i{display:block;height:100%}
+.diag-badge{font-family:"Noto Serif TC",serif;font-weight:700;font-size:16px;display:flex;align-items:center;gap:8px}
+.diag-tip{font-size:12.5px;color:var(--ink2);margin-top:8px;line-height:1.6}
+.diag-tip b{color:var(--coral)}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--ink2);margin-top:8px}
+.legend span{display:flex;align-items:center;gap:4px}
+.legend i{width:9px;height:9px;border-radius:3px;display:inline-block}
+
+/* note */
+.note{margin-top:22px;font-size:12.5px;color:var(--ink2);line-height:1.7;background:var(--paper2);border:1px solid var(--line);border-radius:13px;padding:14px 16px}
+.note b{color:var(--ink)}
+
+@media(max-width:880px){
+  .main{grid-template-columns:1fr}
+  .pane-r{position:static}
+  .pane-l{border-radius:0 var(--r) var(--r) var(--r)}
+  .sb-block{padding-right:10px}
+}
+.fadein{animation:fade .5s ease both}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+/* confetti */
+.confetti{position:fixed;top:-10px;width:9px;height:14px;z-index:99;pointer-events:none;border-radius:2px}
+@keyframes drop{to{transform:translateY(105vh) rotate(540deg);opacity:.9}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kicker"><span class="dot"></span>115 學年度 ｜ 依基北區免試入學正式比序規則</div>
+    <h1 class="serif">落點 <i class="x">×</i> 選填志願 模擬器</h1>
+    <p class="lede">輸入你的會考成績，立刻換算<b>基北會考積分</b>與<b>五專會考成績</b>，瀏覽 114・115 年官方最低錄取積分，把心儀的校科加進志願表，系統會<b>依你的志願順序模擬分發落點</b>。先排兵布陣，再上場。</p>
+  </header>
+
+  <!-- sticky score bar -->
+  <div class="scorebar" id="scorebar">
+    <div class="sb-block">
+      <span class="sb-lab">基北會考積分</span>
+      <span><span class="sb-num dim" id="sbJB">—</span> <span class="sb-unit">/ 36</span></span>
+    </div>
+    <div class="sb-block">
+      <span class="sb-lab">五專會考成績</span>
+      <span><span class="sb-num dim" id="sbWU" style="color:var(--coral)">—</span> <span class="sb-unit">/ 31</span></span>
+    </div>
+    <div class="sb-spacer"></div>
+    <div class="sb-hint" id="sbHint">↓ 先在下方輸入 <b>5 科會考等級 + 寫作級分</b></div>
+  </div>
+
+  <!-- step 1: grades -->
+  <section class="card grades">
+    <div class="ghead">
+      <h2 class="sec-title"><span class="step-no">1</span>輸入你的會考成績</h2>
+      <span class="muted">點選每科等級；分數會即時換算</span>
+    </div>
+    <div id="gradeRows"></div>
+    <div class="gactions">
+      <button class="btn ghost" id="btnDemo">填入範例（中段成績）</button>
+      <button class="btn ghost" id="btnClear">清除</button>
+    </div>
+  </section>
+
+  <!-- tabs -->
+  <div class="tabs">
+    <div class="tab on" data-mode="jb">基北高中職<span class="small">免試入學 · 114・115 年最低錄取積分</span></div>
+    <div class="tab" data-mode="wu">五專優免<span class="small">114 各科組最低錄取標準</span></div>
+  </div>
+
+  <!-- main -->
+  <div class="main">
+    <div class="pane-l">
+      <div class="filters" id="filters"></div>
+      <div class="listhead">
+        <span id="listCount">—</span>
+        <span class="muted">點 <b style="color:var(--gold)">☆</b> 加入志願表</span>
+      </div>
+      <div class="list" id="list"></div>
+    </div>
+
+    <div class="pane-r">
+      <div class="vcard">
+        <div class="vhead">
+          <h3 class="serif">🎯 我的志願表 <span class="cnt" id="vCnt">(0)</span></h3>
+        </div>
+        <div id="placement"></div>
+        <div class="vlist" id="vlist"></div>
+      </div>
+      <div class="vcard" id="diagCard" style="display:none">
+        <div class="diag">
+          <div class="diag-badge serif" id="diagBadge"></div>
+          <div class="diag-bar" id="diagBar"></div>
+          <div class="diag-tip" id="diagTip"></div>
+          <div class="legend">
+            <span><i style="background:var(--safe)"></i>安全</span>
+            <span><i style="background:var(--steady)"></i>穩當</span>
+            <span><i style="background:var(--reach)"></i>挑戰</span>
+            <span><i style="background:var(--dream)"></i>夢幻</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note" id="note"></div>
+</div>
+
+<script>
+const JB_DATA = [{"s": "建國高中", "d": "普通科(男)", "r": "北市", "p": "公", "t": "高中", "y": [33.8, 33.8]}, {"s": "第一女中", "d": "普通科(女)", "r": "北市", "p": "公", "t": "高中", "y": [33.8, 33.8]}, {"s": "師大附中", "d": "普通科(男)", "r": "北市", "p": "公", "t": "高中", "y": [32.8, 33.6]}, {"s": "師大附中", "d": "普通科(女)", "r": "北市", "p": "公", "t": "高中", "y": [32.8, 33.0]}, {"s": "成功高中", "d": "普通科(男)", "r": "北市", "p": "公", "t": "高中", "y": [31.6, 31.6]}, {"s": "中山女中", "d": "普通科(女)", "r": "北市", "p": "公", "t": "高中", "y": [30.8, 30.8]}, {"s": "松山高中", "d": "普通科(男)", "r": "北市", "p": "公", "t": "高中", "y": [30.6, 30.8]}, {"s": "松山高中", "d": "普通科(女)", "r": "北市", "p": "公", "t": "高中", "y": [29.8, 29.8]}, {"s": "大同高中", "d": "普通科", "r": "北市", "p": "公", "t": "高中", "y": [29.6, 29.8]}, {"s": "中崙高中", "d": "普通科", "r": "北市", "p": "公", "t": "高中", "y": [28.6, 28.8]}, {"s": "政大附中", "d": "普通科", "r": "北市", "p": "公", "t": "高中", "y": [28.6, 28.6]}, {"s": "成淵高中", "d": "普通科", "r": "北市", "p": "公", "t": "高中", "y": [27.6, 28.6]}, {"s": "板橋高中", "d": "普通科(男)", "r": "新北", "p": "公", "t": "高中", "y": [28.6, 28.6]}, {"s": "板橋高中", "d": "普通科(女)", "r": "新北", "p": "公", "t": "高中", "y": [27.8, 27.8]}, {"s": "麗山高中", "d": "普通科", "r": "北市", "p": "公", "t": "高中", "y": [26.8, 27.6]}, {"s": "大直高中", "d": "普通科", "r": "北市", "p": "公", "t": "高中", "y": [26.6, 26.8]}, {"s": "海山高中", "d": "普通科", "r": "新北", "p": "公", "t": "高中", "y": [26.6, 26.8]}, {"s": "和平高中", "d": "普通科", "r": "北市", "p": "公", "t": "高中", "y": [25.8, 26.6]}, {"s": "明倫高中", "d": "普通科", "r": "北市", "p": "公", "t": "高中", "y": [25.6, 25.6]}, {"s": "西松高中", "d": "普通科", "r": "北市", "p": "公", "t": "高中", "y": [24.6, 24.8]}, {"s": "北大高中", "d": "普通科", "r": "新北", "p": "公", "t": "高中", "y": [24.6, 24.8]}, {"s": "百齡高中", "d": "普通科", "r": "北市", "p": "公", "t": "高中", "y": [23.6, 24.6]}, {"s": "內湖高中", "d": "普通科(女)", "r": "北市", "p": "公", "t": "高中", "y": [23.8, 24.6]}, {"s": "內湖高中", "d": "普通科(男)", "r": "北市", "p": "公", "t": "高中", "y": [25.6, 23.8]}, {"s": "中正高中", "d": "普通科", "r": "北市", "p": "公", "t": "高中", "y": [22.8, 22.8]}, {"s": "景美女中", "d": "普通科(女)", "r": "北市", "p": "公", "t": "高中", "y": [22.8, 22.8]}, {"s": "中和高中", "d": "普通科", "r": "新北", "p": "公", "t": "高中", "y": [21.8, 22.6]}, {"s": "陽明高中", "d": "普通科", "r": "北市", "p": "公", "t": "高中", "y": [21.8, 22.6]}, {"s": "南湖高中", "d": "普通科", "r": "北市", "p": "公", "t": "高中", "y": [21.6, 21.6]}, {"s": "永平高中", "d": "普通科", "r": "新北", "p": "公", "t": "高中", "y": [20.6, 21.6]}, {"s": "新莊高中", "d": "普通科", "r": "新北", "p": "公", "t": "高中", "y": [20.6, 20.8]}, {"s": "南港高中", "d": "普通科", "r": "北市", "p": "公", "t": "高中", "y": [20.6, 20.6]}, {"s": "華江高中", "d": "普通科", "r": "北市", "p": "公", "t": "高中", "y": [19.6, 20.6]}, {"s": "丹鳳高中", "d": "普通科", "r": "新北", "p": "公", "t": "高中", "y": [19.6, 19.8]}, {"s": "新北高中", "d": "普通科", "r": "新北", "p": "公", "t": "高中", "y": [19.6, 19.6]}, {"s": "永春高中", "d": "普通科", "r": "北市", "p": "公", "t": "高中", "y": [18.6, 18.6]}, {"s": "錦和高中", "d": "普通科", "r": "新北", "p": "公", "t": "高中", "y": [17.6, 18.6]}, {"s": "新店高中", "d": "普通科", "r": "新北", "p": "公", "t": "高中", "y": [17.6, 17.8]}, {"s": "三民高中", "d": "普通科", "r": "新北", "p": "公", "t": "高中", "y": [17.6, 17.8]}, {"s": "萬芳高中", "d": "普通科", "r": "北市", "p": "公", "t": "高中", "y": [16.6, 17.6]}, {"s": "三重高中", "d": "普通科", "r": "新北", "p": "公", "t": "高中", "y": [15.8, 16.6]}, {"s": "林口高中", "d": "普通科", "r": "新北", "p": "公", "t": "高中", "y": [15.4, 16.6]}, {"s": "育成高中", "d": "普通科", "r": "北市", "p": "公", "t": "高中", "y": [15.6, 15.8]}, {"s": "清水高中", "d": "普通科", "r": "新北", "p": "公", "t": "高中", "y": [13.8, 15.4]}, {"s": "安康高中", "d": "普通科", "r": "新北", "p": "公", "t": "高中", "y": [12.6, 14.6]}, {"s": "樹林高中", "d": "普通科", "r": "新北", "p": "公", "t": "高中", "y": [12.8, 14.4]}, {"s": "泰山高中", "d": "普通科", "r": "新北", "p": "公", "t": "高中", "y": [12.6, 13.6]}, {"s": "復興高中", "d": "普通科", "r": "北市", "p": "公", "t": "高中", "y": [11.6, 12.8]}, {"s": "秀峰高中", "d": "普通科", "r": "新北", "p": "公", "t": "高中", "y": [10.6, 12.6]}, {"s": "明德高中", "d": "普通科", "r": "新北", "p": "公", "t": "高中", "y": [9.6, 11.6]}, {"s": "淡水商工", "d": "普通科", "r": "新北", "p": "公", "t": "高中", "y": [6.6, 9.6]}, {"s": "基隆女中", "d": "普通科(女)", "r": "基隆", "p": "公", "t": "高中", "y": [null, 11.6]}, {"s": "基隆高中", "d": "普通科(男)", "r": "基隆", "p": "公", "t": "高中", "y": [7.6, null]}, {"s": "基隆高中", "d": "普通科(女)", "r": "基隆", "p": "公", "t": "高中", "y": [null, 12.6]}, {"s": "安樂高中", "d": "普通科", "r": "基隆", "p": "公", "t": "高中", "y": [null, 21.6]}, {"s": "私立大同高中", "d": "普通科", "r": "北市", "p": "私", "t": "高中", "y": [9.1, 10.6]}, {"s": "私立中信高中", "d": "普通科", "r": "新北", "p": "私", "t": "高中", "y": [9.6, 9.6]}, {"s": "私立光仁高中", "d": "普通科", "r": "新北", "p": "私", "t": "高中", "y": [10.6, 11.6]}, {"s": "私立再興高中", "d": "普通科", "r": "北市", "p": "私", "t": "高中", "y": [26.8, null]}, {"s": "私立竹林高中", "d": "普通科", "r": "新北", "p": "私", "t": "高中", "y": [8.6, 8.6]}, {"s": "私立育達高中", "d": "普通科", "r": "北市", "p": "私", "t": "高中", "y": [7.6, null]}, {"s": "私立延平高中", "d": "普通科", "r": "北市", "p": "私", "t": "高中", "y": [28.6, 29.6]}, {"s": "私立東山高中", "d": "普通科", "r": "北市", "p": "私", "t": "高中", "y": [19.6, 20.8]}, {"s": "私立金陵女中", "d": "普通科(女)", "r": "新北", "p": "私", "t": "高中", "y": [6.4, 10.2]}, {"s": "私立金甌女中", "d": "普通科(女)", "r": "北市", "p": "私", "t": "高中", "y": [9.6, 5.6]}, {"s": "私立南山高中", "d": "普通科", "r": "新北", "p": "私", "t": "高中", "y": [23.8, 22.6]}, {"s": "私立恆毅高中", "d": "普通科", "r": "新北", "p": "私", "t": "高中", "y": [8.6, 8.6]}, {"s": "私立格致高中", "d": "普通科", "r": "新北", "p": "私", "t": "高中", "y": [null, 10.6]}, {"s": "私立泰北高中", "d": "普通科", "r": "北市", "p": "私", "t": "高中", "y": [null, 13.6]}, {"s": "私立崇光女中", "d": "普通科(女)", "r": "新北", "p": "私", "t": "高中", "y": [10.6, 12.6]}, {"s": "私立康橋高中", "d": "普通科", "r": "新北", "p": "私", "t": "高中", "y": [25.6, null]}, {"s": "私立復興實中", "d": "普通科", "r": "北市", "p": "私", "t": "高中", "y": [21.8, 27.4]}, {"s": "私立景文高中", "d": "普通科", "r": "北市", "p": "私", "t": "高中", "y": [null, 9.6]}, {"s": "私立新民高中", "d": "普通科", "r": "北市", "p": "私", "t": "高中", "y": [12.6, 12.6]}, {"s": "私立衛理女中", "d": "普通科(女)", "r": "北市", "p": "私", "t": "高中", "y": [15.6, null]}, {"s": "私立靜修高中", "d": "普通科(女)", "r": "北市", "p": "私", "t": "高中", "y": [12.6, 12.6]}, {"s": "私立辭修高中", "d": "普通科", "r": "新北", "p": "私", "t": "高中", "y": [17.8, null]}, {"s": "大理高中", "d": "綜合高中", "r": "北市", "p": "公", "t": "綜高", "y": [16.6, 17.6]}, {"s": "華僑高中", "d": "綜合高中", "r": "新北", "p": "公", "t": "綜高", "y": [18.6, 19.6]}, {"s": "石碇高中", "d": "綜合高中", "r": "新北", "p": "公", "t": "綜高", "y": [5.4, 8.6]}, {"s": "光復高中", "d": "綜合高中", "r": "新北", "p": "公", "t": "綜高", "y": [16.6, 17.6]}, {"s": "雙溪高中", "d": "綜合高中", "r": "新北", "p": "公", "t": "綜高", "y": [8.6, 6.4]}, {"s": "海大附中", "d": "海洋科技人才培育實驗班", "r": "基隆", "p": "公", "t": "高中", "y": [17.6, null]}, {"s": "中正高中", "d": "國際移動力課程實驗班(IB-CP)", "r": "北市", "p": "公", "t": "高中", "y": [15.6, null]}, {"s": "木柵高工", "d": "多媒體設計科", "r": "北市", "p": "公", "t": "高職", "y": [12.6, 11.8]}, {"s": "木柵高工", "d": "冷凍空調科", "r": "北市", "p": "公", "t": "高職", "y": [9.4, 10.6]}, {"s": "木柵高工", "d": "配管科", "r": "北市", "p": "公", "t": "高職", "y": [null, 12.4]}, {"s": "木柵高工", "d": "電子科", "r": "北市", "p": "公", "t": "高職", "y": [8.6, 11.2]}, {"s": "木柵高工", "d": "電機科", "r": "北市", "p": "公", "t": "高職", "y": [9.6, 11.6]}, {"s": "木柵高工", "d": "製圖科", "r": "北市", "p": "公", "t": "高職", "y": [7.6, 11.4]}, {"s": "木柵高工", "d": "模具科", "r": "北市", "p": "公", "t": "高職", "y": [8.6, 8.6]}, {"s": "木柵高工", "d": "機械科", "r": "北市", "p": "公", "t": "高職", "y": [6.6, 9.6]}, {"s": "木柵高工", "d": "鑄造科", "r": "北市", "p": "公", "t": "高職", "y": [7.6, 8.6]}, {"s": "大安高工", "d": "冷凍空調科", "r": "北市", "p": "公", "t": "高職", "y": [20.6, 24.8]}, {"s": "大安高工", "d": "汽車科", "r": "北市", "p": "公", "t": "高職", "y": [18.6, 18.8]}, {"s": "大安高工", "d": "建築科", "r": "北市", "p": "公", "t": "高職", "y": [20.6, 20.8]}, {"s": "大安高工", "d": "控制科", "r": "北市", "p": "公", "t": "高職", "y": [24.6, 26.6]}, {"s": "大安高工", "d": "資訊科", "r": "北市", "p": "公", "t": "高職", "y": [25.6, 26.4]}, {"s": "大安高工", "d": "電子科", "r": "北市", "p": "公", "t": "高職", "y": [25.8, 26.6]}, {"s": "大安高工", "d": "電腦機械製圖科", "r": "北市", "p": "公", "t": "高職", "y": [18.6, 19.6]}, {"s": "大安高工", "d": "電機科", "r": "北市", "p": "公", "t": "高職", "y": [27.6, 27.8]}, {"s": "大安高工", "d": "圖文傳播科", "r": "北市", "p": "公", "t": "高職", "y": [18.8, 20.6]}, {"s": "大安高工", "d": "綜合高中", "r": "北市", "p": "公", "t": "綜高", "y": [19.6, 20.6]}, {"s": "大安高工", "d": "機械科", "r": "北市", "p": "公", "t": "高職", "y": [21.6, 22.6]}, {"s": "大安高工進修部", "d": "汽車科(夜間班)", "r": "北市", "p": "公", "t": "高職", "y": [8.0, 7.1]}, {"s": "大安高工進修部", "d": "建築科(夜間班)", "r": "北市", "p": "公", "t": "高職", "y": [null, 9.6]}, {"s": "大安高工進修部", "d": "電子科(夜間班)", "r": "北市", "p": "公", "t": "高職", "y": [10.6, 15.6]}, {"s": "大安高工進修部", "d": "機械科(夜間班)", "r": "北市", "p": "公", "t": "高職", "y": [null, 8.2]}, {"s": "士林高商", "d": "商業經營科", "r": "北市", "p": "公", "t": "高職", "y": [13.6, 14.6]}, {"s": "士林高商", "d": "國際貿易科", "r": "北市", "p": "公", "t": "高職", "y": [12.6, 13.6]}, {"s": "士林高商", "d": "會計事務科", "r": "北市", "p": "公", "t": "高職", "y": [15.6, 14.6]}, {"s": "士林高商", "d": "資料處理科", "r": "北市", "p": "公", "t": "高職", "y": [14.6, 14.8]}, {"s": "士林高商", "d": "廣告設計科", "r": "北市", "p": "公", "t": "高職", "y": [16.6, 15.8]}, {"s": "士林高商", "d": "應用英語科", "r": "北市", "p": "公", "t": "高職", "y": [15.6, 17.6]}, {"s": "松山工農", "d": "化工科", "r": "北市", "p": "公", "t": "高職", "y": [14.8, 17.6]}, {"s": "松山工農", "d": "汽車科", "r": "北市", "p": "公", "t": "高職", "y": [13.6, 13.8]}, {"s": "松山工農", "d": "食品加工科", "r": "北市", "p": "公", "t": "高職", "y": [13.6, 14.4]}, {"s": "松山工農", "d": "園藝科", "r": "北市", "p": "公", "t": "高職", "y": [11.6, 15.6]}, {"s": "松山工農", "d": "資訊科", "r": "北市", "p": "公", "t": "高職", "y": [16.6, 17.8]}, {"s": "松山工農", "d": "電子科", "r": "北市", "p": "公", "t": "高職", "y": [18.6, 19.6]}, {"s": "松山工農", "d": "電機科", "r": "北市", "p": "公", "t": "高職", "y": [18.6, 21.6]}, {"s": "松山工農", "d": "綜合高中", "r": "北市", "p": "公", "t": "綜高", "y": [14.6, 16.2]}, {"s": "松山工農", "d": "機械科", "r": "北市", "p": "公", "t": "高職", "y": [16.6, 16.6]}, {"s": "松山家商", "d": "室內設計科", "r": "北市", "p": "公", "t": "高職", "y": [14.8, 15.6]}, {"s": "松山家商", "d": "商業經營科", "r": "北市", "p": "公", "t": "高職", "y": [10.6, 12.6]}, {"s": "松山家商", "d": "國際貿易科", "r": "北市", "p": "公", "t": "高職", "y": [15.6, 12.4]}, {"s": "松山家商", "d": "會計事務科", "r": "北市", "p": "公", "t": "高職", "y": [12.6, 12.6]}, {"s": "松山家商", "d": "資料處理科", "r": "北市", "p": "公", "t": "高職", "y": [11.6, 12.6]}, {"s": "松山家商", "d": "廣告設計科", "r": "北市", "p": "公", "t": "高職", "y": [13.6, 13.6]}, {"s": "松山家商", "d": "應用英語科", "r": "北市", "p": "公", "t": "高職", "y": [13.6, 14.6]}, {"s": "南港高工", "d": "土木科", "r": "北市", "p": "公", "t": "高職", "y": [10.6, 11.6]}, {"s": "南港高工", "d": "冷凍空調科", "r": "北市", "p": "公", "t": "高職", "y": [10.4, 11.8]}, {"s": "南港高工", "d": "汽車科", "r": "北市", "p": "公", "t": "高職", "y": [10.6, 11.6]}, {"s": "南港高工", "d": "建築科", "r": "北市", "p": "公", "t": "高職", "y": [12.4, 13.6]}, {"s": "南港高工", "d": "重機科", "r": "北市", "p": "公", "t": "高職", "y": [9.4, 10.6]}, {"s": "南港高工", "d": "電子科", "r": "北市", "p": "公", "t": "高職", "y": [12.6, 14.6]}, {"s": "南港高工", "d": "電機科", "r": "北市", "p": "公", "t": "高職", "y": [13.6, 15.6]}, {"s": "南港高工", "d": "模具科", "r": "北市", "p": "公", "t": "高職", "y": [9.6, 10.4]}, {"s": "南港高工", "d": "機械科", "r": "北市", "p": "公", "t": "高職", "y": [10.6, 11.8]}, {"s": "南港高工", "d": "鑄造科", "r": "北市", "p": "公", "t": "高職", "y": [8.6, 10.4]}, {"s": "臺灣戲曲學院", "d": "劇場藝術科", "r": "北市", "p": "公", "t": "高職", "y": [6.4, 5.4]}, {"s": "內湖高工", "d": "冷凍空調科", "r": "北市", "p": "公", "t": "高職", "y": [8.6, 10.4]}, {"s": "內湖高工", "d": "控制科", "r": "北市", "p": "公", "t": "高職", "y": [null, 10.6]}, {"s": "內湖高工", "d": "資訊科", "r": "北市", "p": "公", "t": "高職", "y": [11.6, 11.6]}, {"s": "內湖高工", "d": "電子科", "r": "北市", "p": "公", "t": "高職", "y": [8.4, 10.6]}, {"s": "內湖高工", "d": "電機科", "r": "北市", "p": "公", "t": "高職", "y": [11.6, 12.6]}, {"s": "內湖高工", "d": "應用英語科", "r": "北市", "p": "公", "t": "高職", "y": [9.6, 11.6]}, {"s": "新北高工", "d": "汽車科", "r": "新北", "p": "公", "t": "高職", "y": [11.6, 12.6]}, {"s": "新北高工", "d": "資料處理科", "r": "新北", "p": "公", "t": "高職", "y": [12.6, 13.6]}, {"s": "新北高工", "d": "資訊科", "r": "新北", "p": "公", "t": "高職", "y": [15.6, 16.6]}, {"s": "新北高工", "d": "電機科", "r": "新北", "p": "公", "t": "高職", "y": [14.4, 16.4]}, {"s": "新北高工", "d": "製圖科", "r": "新北", "p": "公", "t": "高職", "y": [11.6, 13.6]}, {"s": "新北高工", "d": "模具科", "r": "新北", "p": "公", "t": "高職", "y": [10.6, 11.6]}, {"s": "新北高工", "d": "機械科", "r": "新北", "p": "公", "t": "高職", "y": [13.4, 15.6]}, {"s": "新北高工", "d": "應用英語科", "r": "新北", "p": "公", "t": "高職", "y": [11.6, 12.8]}, {"s": "新北高工", "d": "鑄造科", "r": "新北", "p": "公", "t": "高職", "y": [11.6, 11.4]}, {"s": "新北高工進修部", "d": "汽車科(夜間班)", "r": "新北", "p": "公", "t": "高職", "y": [7.6, null]}, {"s": "新北高工進修部", "d": "資料處理科(夜間班)", "r": "新北", "p": "公", "t": "高職", "y": [10.4, 8.1]}, {"s": "新北高工進修部", "d": "資訊科(夜間班)", "r": "新北", "p": "公", "t": "高職", "y": [12.6, 6.4]}, {"s": "新北高工進修部", "d": "機械科(夜間班)", "r": "新北", "p": "公", "t": "高職", "y": [7.4, 9.2]}, {"s": "淡水商工", "d": "商業經營科", "r": "新北", "p": "公", "t": "高職", "y": [8.6, 11.6]}, {"s": "淡水商工", "d": "會計事務科", "r": "新北", "p": "公", "t": "高職", "y": [null, 7.2]}, {"s": "淡水商工", "d": "資料處理科", "r": "新北", "p": "公", "t": "高職", "y": [null, 7.2]}, {"s": "淡水商工", "d": "資訊科", "r": "新北", "p": "公", "t": "高職", "y": [null, 7.6]}, {"s": "淡水商工", "d": "電子科", "r": "新北", "p": "公", "t": "高職", "y": [5.4, 10.6]}, {"s": "淡水商工", "d": "電機科", "r": "新北", "p": "公", "t": "高職", "y": [8.6, 8.6]}, {"s": "淡水商工", "d": "餐飲管理科", "r": "新北", "p": "公", "t": "高職", "y": [11.6, 12.6]}, {"s": "淡水商工進修部", "d": "餐飲管理科(夜間班)", "r": "新北", "p": "公", "t": "高職", "y": [null, 8.6]}, {"s": "三重商工", "d": "汽車科", "r": "新北", "p": "公", "t": "高職", "y": [9.6, 10.8]}, {"s": "三重商工", "d": "板金科", "r": "新北", "p": "公", "t": "高職", "y": [8.6, 9.6]}, {"s": "三重商工", "d": "商業經營科", "r": "新北", "p": "公", "t": "高職", "y": [null, 15.6]}, {"s": "三重商工", "d": "國際貿易科", "r": "新北", "p": "公", "t": "高職", "y": [null, 11.6]}, {"s": "三重商工", "d": "資料處理科", "r": "新北", "p": "公", "t": "高職", "y": [10.8, 11.8]}, {"s": "三重商工", "d": "機械科", "r": "新北", "p": "公", "t": "高職", "y": [10.6, null]}, {"s": "三重商工", "d": "應用英語科", "r": "新北", "p": "公", "t": "高職", "y": [12.4, 12.6]}, {"s": "泰山高中", "d": "電機科", "r": "新北", "p": "公", "t": "高職", "y": [null, 12.6]}, {"s": "泰山高中", "d": "機械科", "r": "新北", "p": "公", "t": "高職", "y": [9.6, null]}, {"s": "樟樹實中", "d": "多媒體動畫科", "r": "新北", "p": "公", "t": "高職", "y": [9.6, 11.6]}, {"s": "樟樹實中", "d": "流行服飾科", "r": "新北", "p": "公", "t": "高職", "y": [null, 11.6]}, {"s": "瑞芳高工", "d": "室內空間設計科", "r": "新北", "p": "公", "t": "高職", "y": [null, 12.8]}, {"s": "瑞芳高工", "d": "電機科", "r": "新北", "p": "公", "t": "高職", "y": [null, 8.4]}, {"s": "鶯歌工商", "d": "美術工藝科", "r": "新北", "p": "公", "t": "高職", "y": [null, 9.6]}, {"s": "鶯歌工商", "d": "陶瓷工程科", "r": "新北", "p": "公", "t": "高職", "y": [9.4, 6.6]}, {"s": "鶯歌工商", "d": "資料處理科", "r": "新北", "p": "公", "t": "高職", "y": [6.6, null]}, {"s": "鶯歌工商", "d": "資訊科", "r": "新北", "p": "公", "t": "高職", "y": [11.6, null]}, {"s": "鶯歌工商", "d": "多媒體設計科", "r": "新北", "p": "公", "t": "高職", "y": [null, 16.6]}, {"s": "鶯歌工商", "d": "廣告設計科", "r": "新北", "p": "公", "t": "高職", "y": [10.8, 9.6]}, {"s": "鶯歌工商", "d": "應用日語科", "r": "新北", "p": "公", "t": "高職", "y": [14.6, null]}, {"s": "基隆商工", "d": "資訊科", "r": "基隆", "p": "公", "t": "高職", "y": [8.4, null]}, {"s": "海大附中", "d": "食品科", "r": "基隆", "p": "公", "t": "高職", "y": [null, 10.6]}, {"s": "海大附中", "d": "烘焙科", "r": "基隆", "p": "公", "t": "高職", "y": [10.6, null]}, {"s": "海大附中", "d": "航海科", "r": "基隆", "p": "公", "t": "高職", "y": [11.6, 10.6]}, {"s": "海大附中", "d": "漁業科", "r": "基隆", "p": "公", "t": "高職", "y": [6.4, 6.4]}, {"s": "海大附中", "d": "輪機科", "r": "基隆", "p": "公", "t": "高職", "y": [11.6, null]}, {"s": "私立大同高中", "d": "資料處理科", "r": "北市", "p": "私", "t": "高職", "y": [null, 10.6]}, {"s": "私立大同高中", "d": "資訊科", "r": "北市", "p": "私", "t": "高職", "y": [7.6, null]}, {"s": "私立育達高中", "d": "多媒體設計科", "r": "北市", "p": "私", "t": "高職", "y": [null, 8.2]}, {"s": "私立育達高中", "d": "表演藝術科", "r": "北市", "p": "私", "t": "高職", "y": [null, 16.6]}, {"s": "私立育達高中", "d": "時尚造型科", "r": "北市", "p": "私", "t": "高職", "y": [null, 7.6]}, {"s": "私立育達高中", "d": "餐飲管理科", "r": "北市", "p": "私", "t": "高職", "y": [null, 5.1]}, {"s": "私立育達高中", "d": "觀光事業科", "r": "北市", "p": "私", "t": "高職", "y": [null, 7.4]}, {"s": "私立東方工商", "d": "時尚造型科", "r": "北市", "p": "私", "t": "高職", "y": [8.6, null]}, {"s": "私立東方工商", "d": "餐飲管理科", "r": "北市", "p": "私", "t": "高職", "y": [8.6, null]}, {"s": "私立金甌女中", "d": "多媒體設計科(女)", "r": "北市", "p": "私", "t": "高職", "y": [11.4, 9.6]}, {"s": "私立金甌女中", "d": "商業經營科(女)", "r": "北市", "p": "私", "t": "高職", "y": [8.6, 6.4]}, {"s": "私立金甌女中", "d": "應用日語科(女)", "r": "北市", "p": "私", "t": "高職", "y": [7.6, 5.2]}, {"s": "私立金甌女中", "d": "應用英語科(女)", "r": "北市", "p": "私", "t": "高職", "y": [null, 8.4]}, {"s": "私立金甌女中", "d": "觀光事業科(女)", "r": "北市", "p": "私", "t": "高職", "y": [null, 6.0]}, {"s": "私立泰北高中", "d": "多媒體設計科", "r": "北市", "p": "私", "t": "高職", "y": [null, 8.4]}, {"s": "私立泰北高中", "d": "表演藝術科", "r": "北市", "p": "私", "t": "高職", "y": [12.6, null]}, {"s": "私立喬治工商", "d": "時尚造型科", "r": "北市", "p": "私", "t": "高職", "y": [5.1, null]}, {"s": "私立喬治工商進修部", "d": "時尚造型科(週間二日)", "r": "北市", "p": "私", "t": "高職", "y": [5.1, null]}, {"s": "私立景文高中", "d": "商業經營科", "r": "北市", "p": "私", "t": "高職", "y": [7.6, 5.4]}, {"s": "私立開南高中", "d": "汽車科", "r": "北市", "p": "私", "t": "高職", "y": [5.2, 8.6]}, {"s": "私立開南高中", "d": "電機科", "r": "北市", "p": "私", "t": "高職", "y": [5.6, 7.4]}, {"s": "私立開南高中", "d": "廣告設計科", "r": "北市", "p": "私", "t": "高職", "y": [7.6, null]}, {"s": "私立開南高中", "d": "餐飲管理科", "r": "北市", "p": "私", "t": "高職", "y": [8.6, 7.8]}, {"s": "私立稻江高商", "d": "廣告設計科", "r": "北市", "p": "私", "t": "高職", "y": [6.6, null]}, {"s": "私立稻江高商", "d": "應用日語科", "r": "北市", "p": "私", "t": "高職", "y": [11.6, 7.6]}, {"s": "私立稻江護家", "d": "幼兒保育科", "r": "北市", "p": "私", "t": "高職", "y": [5.2, 6.4]}, {"s": "私立稻江護家", "d": "餐飲管理科", "r": "北市", "p": "私", "t": "高職", "y": [7.6, 7.6]}, {"s": "私立稻江護家", "d": "應用日語科", "r": "北市", "p": "私", "t": "高職", "y": [null, 6.6]}, {"s": "私立稻江護家", "d": "應用英語科", "r": "北市", "p": "私", "t": "高職", "y": [10.4, null]}, {"s": "私立靜修高中", "d": "應用日語科(女)", "r": "北市", "p": "私", "t": "高職", "y": [8.6, 10.6]}, {"s": "私立靜修高中", "d": "應用英語科(女)", "r": "北市", "p": "私", "t": "高職", "y": [10.6, 8.6]}, {"s": "私立東海高中", "d": "餐飲管理科", "r": "新北", "p": "私", "t": "高職", "y": [8.6, null]}, {"s": "私立穀保家商", "d": "餐飲管理科", "r": "新北", "p": "私", "t": "高職", "y": [null, 6.6]}, {"s": "私立能仁家商", "d": "幼兒保育科", "r": "新北", "p": "私", "t": "高職", "y": [null, 10.4]}, {"s": "私立能仁家商", "d": "多媒體設計科", "r": "新北", "p": "私", "t": "高職", "y": [10.8, 6.6]}, {"s": "私立能仁家商", "d": "表演藝術科", "r": "新北", "p": "私", "t": "高職", "y": [7.6, null]}, {"s": "私立能仁家商", "d": "流行服飾科", "r": "新北", "p": "私", "t": "高職", "y": [9.6, null]}, {"s": "私立能仁家商", "d": "美容科", "r": "新北", "p": "私", "t": "高職", "y": [5.4, null]}, {"s": "私立能仁家商", "d": "商業經營科", "r": "新北", "p": "私", "t": "高職", "y": [null, 8.6]}, {"s": "私立能仁家商", "d": "廣告設計科", "r": "新北", "p": "私", "t": "高職", "y": [7.0, null]}, {"s": "私立能仁家商", "d": "餐飲管理科", "r": "新北", "p": "私", "t": "高職", "y": [6.4, 7.1]}, {"s": "私立莊敬工家", "d": "多媒體動畫科", "r": "新北", "p": "私", "t": "高職", "y": [null, 7.4]}, {"s": "私立莊敬工家", "d": "表演藝術科", "r": "新北", "p": "私", "t": "高職", "y": [6.6, 10.6]}, {"s": "私立莊敬工家", "d": "美容科", "r": "新北", "p": "私", "t": "高職", "y": [5.6, 6.6]}, {"s": "私立莊敬工家", "d": "資料處理科", "r": "新北", "p": "私", "t": "高職", "y": [7.1, 8.6]}, {"s": "私立莊敬工家", "d": "資訊科", "r": "新北", "p": "私", "t": "高職", "y": [9.6, 9.1]}, {"s": "私立莊敬工家", "d": "餐飲管理科", "r": "新北", "p": "私", "t": "高職", "y": [7.6, 5.6]}, {"s": "私立復興商工", "d": "室內設計科", "r": "新北", "p": "私", "t": "高職", "y": [5.2, 8.6]}, {"s": "私立復興商工", "d": "美工科", "r": "新北", "p": "私", "t": "高職", "y": [7.4, 9.6]}, {"s": "私立復興商工", "d": "美術科", "r": "新北", "p": "私", "t": "高職", "y": [7.6, 6.6]}, {"s": "私立復興商工", "d": "資料處理科", "r": "新北", "p": "私", "t": "高職", "y": [6.6, 5.2]}, {"s": "私立復興商工", "d": "廣告設計科", "r": "新北", "p": "私", "t": "高職", "y": [6.6, 5.0]}, {"s": "私立智光商工", "d": "多媒體設計科", "r": "新北", "p": "私", "t": "高職", "y": [6.4, 7.6]}, {"s": "私立智光商工", "d": "資料處理科", "r": "新北", "p": "私", "t": "高職", "y": [10.6, 8.6]}, {"s": "私立智光商工", "d": "資訊科", "r": "新北", "p": "私", "t": "高職", "y": [10.4, 9.8]}, {"s": "私立智光商工", "d": "電子科", "r": "新北", "p": "私", "t": "高職", "y": [7.4, null]}, {"s": "私立智光商工", "d": "機械科", "r": "新北", "p": "私", "t": "高職", "y": [null, 6.1]}, {"s": "私立智光商工", "d": "餐飲管理科", "r": "新北", "p": "私", "t": "高職", "y": [5.6, 5.0]}, {"s": "私立智光商工", "d": "觀光事業科", "r": "新北", "p": "私", "t": "高職", "y": [7.1, 5.6]}, {"s": "私立智光商工進修部", "d": "餐飲管理科(夜間班)", "r": "新北", "p": "私", "t": "高職", "y": [9.6, 8.6]}, {"s": "私立樹人家商", "d": "幼兒保育科", "r": "新北", "p": "私", "t": "高職", "y": [null, 10.6]}, {"s": "私立樹人家商", "d": "美容科", "r": "新北", "p": "私", "t": "高職", "y": [10.0, 7.6]}, {"s": "私立樹人家商", "d": "商業經營科", "r": "新北", "p": "私", "t": "高職", "y": [null, 9.6]}, {"s": "私立樹人家商", "d": "資料處理科", "r": "新北", "p": "私", "t": "高職", "y": [null, 10.6]}, {"s": "私立樹人家商", "d": "資訊科", "r": "新北", "p": "私", "t": "高職", "y": [null, 11.6]}, {"s": "私立樹人家商", "d": "影劇科", "r": "新北", "p": "私", "t": "高職", "y": [null, 6.4]}, {"s": "私立樹人家商", "d": "餐飲管理科", "r": "新北", "p": "私", "t": "高職", "y": [5.4, null]}, {"s": "私立樹人家商", "d": "觀光事業科", "r": "新北", "p": "私", "t": "高職", "y": [10.6, null]}, {"s": "私立豫章工商", "d": "流通管理科", "r": "新北", "p": "私", "t": "高職", "y": [9.6, null]}, {"s": "私立豫章工商", "d": "資訊科", "r": "新北", "p": "私", "t": "高職", "y": [8.6, 9.6]}, {"s": "私立豫章工商", "d": "電機科", "r": "新北", "p": "私", "t": "高職", "y": [null, 5.0]}, {"s": "私立豫章工商", "d": "餐飲管理科", "r": "新北", "p": "私", "t": "高職", "y": [5.1, 6.1]}, {"s": "私立醒吾高中", "d": "商業經營科", "r": "新北", "p": "私", "t": "高職", "y": [8.6, null]}, {"s": "私立二信高中", "d": "外語群不分科", "r": "基隆", "p": "私", "t": "高職", "y": [8.4, null]}];
+const WU_DATA = [{"s": "國立臺北科技大學", "d": "智慧自動化工程科", "e": true, "m": 90.2, "z": 26.0, "j": 21.0, "f": 15.0, "k": 28.2, "n": true}, {"s": "國立臺北商業大學", "d": "資訊管理科(臺北校區)", "e": true, "m": 83.6, "z": 26.0, "j": 21.0, "f": 15.0, "k": 21.6, "n": true}, {"s": "國立臺中科技大學", "d": "護理科", "e": true, "m": 81.8, "z": 26.0, "j": 21.0, "f": 15.0, "k": 16.8, "n": false}, {"s": "國立臺中科技大學", "d": "創意商品設計菁英班", "e": true, "m": 81.1, "z": 26.0, "j": 21.0, "f": 15.0, "k": 16.6, "n": false}, {"s": "國立臺中科技大學", "d": "國際貿易與經營科", "e": true, "m": 80.8, "z": 26.0, "j": 21.0, "f": 15.0, "k": 18.8, "n": false}, {"s": "國立臺中科技大學", "d": "資訊應用菁英班(五專)", "e": true, "m": 80.6, "z": 26.0, "j": 21.0, "f": 15.0, "k": 15.6, "n": false}, {"s": "國立臺北商業大學", "d": "國際貿易科(臺北校區)", "e": true, "m": 80.6, "z": 26.0, "j": 21.0, "f": 15.0, "k": 18.6, "n": true}, {"s": "國立臺北商業大學", "d": "應用外語科(臺北校區)", "e": true, "m": 80.6, "z": 26.0, "j": 21.0, "f": 15.0, "k": 15.6, "n": true}, {"s": "國立臺北商業大學", "d": "財務金融科(臺北校區)", "e": true, "m": 80.3, "z": 26.0, "j": 21.0, "f": 15.0, "k": 15.8, "n": true}, {"s": "國立高雄餐旅大學", "d": "餐飲廚藝科(五專菁英班)", "e": true, "m": 79.8, "z": 26.0, "j": 21.0, "f": 15.0, "k": 17.8, "n": false}, {"s": "國立臺中科技大學", "d": "應用英語科", "e": true, "m": 79.6, "z": 26.0, "j": 21.0, "f": 15.0, "k": 17.6, "n": false}, {"s": "國立臺中科技大學", "d": "應用日語科", "e": true, "m": 79.6, "z": 26.0, "j": 21.0, "f": 15.0, "k": 17.6, "n": false}, {"s": "國立臺北商業大學", "d": "會計與資料科學科(臺北校區)", "e": true, "m": 79.6, "z": 26.0, "j": 21.0, "f": 15.0, "k": 17.6, "n": true}, {"s": "弘光科技大學", "d": "護理科", "e": true, "m": 79.6, "z": 26.0, "j": 21.0, "f": 15.0, "k": 14.6, "n": false}, {"s": "中臺科技大學", "d": "醫學影像暨放射科學科", "e": true, "m": 79.6, "z": 26.0, "j": 21.0, "f": 15.0, "k": 17.6, "n": false}, {"s": "國立臺北商業大學", "d": "企業管理科(臺北校區)", "e": true, "m": 79.1, "z": 26.0, "j": 21.0, "f": 15.0, "k": 14.6, "n": true}, {"s": "國立虎尾科技大學", "d": "精密機械工程科", "e": true, "m": 78.6, "z": 26.0, "j": 21.0, "f": 15.0, "k": 16.6, "n": false}, {"s": "國立臺中科技大學", "d": "資訊管理科", "e": true, "m": 78.6, "z": 26.0, "j": 21.0, "f": 15.0, "k": 16.6, "n": false}, {"s": "國立臺中科技大學", "d": "資訊工程科", "e": true, "m": 78.6, "z": 26.0, "j": 21.0, "f": 15.0, "k": 13.6, "n": false}, {"s": "國立臺北商業大學", "d": "財政稅務科(臺北校區)", "e": true, "m": 78.6, "z": 26.0, "j": 21.0, "f": 15.0, "k": 16.6, "n": true}, {"s": "國立臺南護理專科學校", "d": "護理科", "e": true, "m": 78.6, "z": 26.0, "j": 21.0, "f": 15.0, "k": 13.6, "n": false}, {"s": "國立虎尾科技大學", "d": "資訊工程科", "e": true, "m": 78.35, "z": 26.0, "j": 21.0, "f": 10.75, "k": 20.6, "n": false}, {"s": "國立臺中科技大學", "d": "企業管理科", "e": true, "m": 77.6, "z": 26.0, "j": 21.0, "f": 15.0, "k": 15.6, "n": false}, {"s": "文藻外語大學", "d": "英國語文科", "e": true, "m": 77.6, "z": 26.0, "j": 21.0, "f": 15.0, "k": 15.6, "n": false}, {"s": "文藻外語大學", "d": "西班牙語文科", "e": true, "m": 77.6, "z": 26.0, "j": 21.0, "f": 15.0, "k": 15.6, "n": false}, {"s": "文藻外語大學", "d": "日本語文科", "e": true, "m": 77.6, "z": 26.0, "j": 21.0, "f": 15.0, "k": 15.6, "n": false}, {"s": "國立臺中科技大學", "d": "會計資訊科", "e": true, "m": 76.8, "z": 26.0, "j": 21.0, "f": 15.0, "k": 11.8, "n": false}, {"s": "國立高雄科技大學", "d": "航海科", "e": true, "m": 76.6, "z": 26.0, "j": 21.0, "f": 15.0, "k": 14.6, "n": false}, {"s": "國立臺中科技大學", "d": "保險金融管理科", "e": true, "m": 76.6, "z": 26.0, "j": 21.0, "f": 15.0, "k": 14.6, "n": false}, {"s": "文藻外語大學", "d": "法國語文科", "e": true, "m": 76.6, "z": 26.0, "j": 21.0, "f": 15.0, "k": 14.6, "n": false}, {"s": "致理科技大學", "d": "應用英語科", "e": true, "m": 76.6, "z": 26.0, "j": 21.0, "f": 15.0, "k": 11.6, "n": true}, {"s": "國立臺南護理專科學校", "d": "化妝品應用科", "e": true, "m": 76.6, "z": 26.0, "j": 21.0, "f": 15.0, "k": 8.6, "n": false}, {"s": "文藻外語大學", "d": "德國語文科", "e": true, "m": 76.3, "z": 26.0, "j": 21.0, "f": 15.0, "k": 8.8, "n": false}, {"s": "致理科技大學", "d": "資訊管理科", "e": true, "m": 76.2, "z": 26.0, "j": 21.0, "f": 15.0, "k": 14.2, "n": true}, {"s": "國立高雄科技大學", "d": "模具工程科", "e": true, "m": 76.1, "z": 26.0, "j": 21.0, "f": 15.0, "k": 11.6, "n": false}, {"s": "嘉南藥理大學", "d": "食藥產業暨檢測科技科", "e": true, "m": 75.8, "z": 26.0, "j": 21.0, "f": 15.0, "k": 10.8, "n": false}, {"s": "致理科技大學", "d": "財務金融科", "e": true, "m": 75.6, "z": 26.0, "j": 21.0, "f": 15.0, "k": 13.6, "n": true}, {"s": "國立臺南護理專科學校", "d": "老人服務事業科", "e": true, "m": 75.6, "z": 26.0, "j": 21.0, "f": 15.0, "k": 10.6, "n": false}, {"s": "馬偕醫護管理專科學校", "d": "護理科", "e": true, "m": 75.6, "z": 26.0, "j": 21.0, "f": 15.0, "k": 10.6, "n": true}, {"s": "致理科技大學", "d": "企業管理科", "e": true, "m": 75.4, "z": 26.0, "j": 21.0, "f": 15.0, "k": 13.4, "n": true}, {"s": "致理科技大學", "d": "國際貿易科", "e": true, "m": 75.3, "z": 26.0, "j": 21.0, "f": 15.0, "k": 10.8, "n": true}, {"s": "嘉南藥理大學", "d": "藥粧生技產業科", "e": true, "m": 75.1, "z": 26.0, "j": 21.0, "f": 14.0, "k": 9.6, "n": false}, {"s": "致理科技大學", "d": "會計資訊科", "e": true, "m": 74.65, "z": 26.0, "j": 21.0, "f": 12.25, "k": 12.4, "n": true}, {"s": "樹人醫護管理專科學校", "d": "物理治療科", "e": true, "m": 74.6, "z": 26.0, "j": 21.0, "f": 15.0, "k": 12.6, "n": false}, {"s": "樹人醫護管理專科學校", "d": "職能治療科", "e": true, "m": 74.6, "z": 26.0, "j": 21.0, "f": 15.0, "k": 12.6, "n": false}, {"s": "國立高雄科技大學", "d": "輪機工程科", "e": true, "m": 74.4, "z": 26.0, "j": 21.0, "f": 15.0, "k": 12.4, "n": false}, {"s": "中華醫事科技大學", "d": "護理科", "e": true, "m": 74.2, "z": 26.0, "j": 21.0, "f": 15.0, "k": 9.2, "n": false}, {"s": "嘉南藥理大學", "d": "食品科技科", "e": true, "m": 73.8, "z": 25.0, "j": 21.0, "f": 15.0, "k": 12.8, "n": false}, {"s": "國立澎湖科技大學", "d": "電機科", "e": true, "m": 73.6, "z": 25.0, "j": 21.0, "f": 15.0, "k": 12.6, "n": false}, {"s": "輔英科技大學", "d": "醫學檢驗生物技術科", "e": true, "m": 73.6, "z": 26.0, "j": 21.0, "f": 10.0, "k": 16.6, "n": false}, {"s": "國立高雄科技大學", "d": "漁業科技與管理科", "e": true, "m": 73.4, "z": 26.0, "j": 21.0, "f": 15.0, "k": 8.4, "n": false}, {"s": "國立臺東專科學校", "d": "餐旅管理科", "e": true, "m": 72.6, "z": 26.0, "j": 21.0, "f": 15.0, "k": 7.6, "n": false}, {"s": "耕莘健康管理專科學校", "d": "護理科(新店校區)", "e": true, "m": 72.1, "z": 26.0, "j": 21.0, "f": 15.0, "k": 7.6, "n": true}, {"s": "敏實科技大學", "d": "餐飲管理科", "e": true, "m": 70.2, "z": 26.0, "j": 21.0, "f": 15.0, "k": 8.2, "n": false}, {"s": "康寧大學(臺北校區)", "d": "", "e": true, "m": 70.2, "z": 26.0, "j": 21.0, "f": 15.0, "k": 8.2, "n": true}, {"s": "嘉南藥理大學", "d": "智慧網路應用科", "e": true, "m": 69.6, "z": 23.0, "j": 21.0, "f": 15.0, "k": 10.6, "n": false}, {"s": "輔英科技大學", "d": "護理科", "e": true, "m": 69.6, "z": 25.0, "j": 21.0, "f": 15.0, "k": 8.6, "n": false}, {"s": "國立臺東專科學校", "d": "食品科技科", "e": true, "m": 69.35, "z": 22.0, "j": 21.0, "f": 12.75, "k": 13.6, "n": false}, {"s": "嘉南藥理大學", "d": "公共安全及消防科", "e": true, "m": 68.7, "z": 25.0, "j": 21.0, "f": 15.0, "k": 6.2, "n": false}, {"s": "嘉南藥理大學", "d": "職業安全衛生科", "e": true, "m": 67.6, "z": 26.0, "j": 21.0, "f": 15.0, "k": 5.6, "n": false}, {"s": "康寧大學(臺北校區)", "d": "", "e": true, "m": 67.1, "z": 26.0, "j": 21.0, "f": 8.5, "k": 11.6, "n": true}, {"s": "嘉南藥理大學", "d": "環境工程與科學科", "e": true, "m": 65.65, "z": 23.0, "j": 21.0, "f": 11.25, "k": 10.4, "n": false}, {"s": "仁德醫護管理專科學校", "d": "高齡健康促進科", "e": false, "m": 65.0, "z": 26.0, "j": 21.0, "f": 15.0, "k": 10.6, "n": false}, {"s": "南臺科技大學", "d": "電機工程科", "e": false, "m": 64.5, "z": 26.0, "j": 21.0, "f": 15.0, "k": 7.4, "n": false}, {"s": "大仁科技大學", "d": "消防安全科", "e": false, "m": 64.5, "z": 26.0, "j": 21.0, "f": 15.0, "k": 7.6, "n": false}, {"s": "中華醫事科技大學", "d": "生物醫學及美容保健科", "e": false, "m": 64.5, "z": 26.0, "j": 21.0, "f": 15.0, "k": 5.4, "n": false}, {"s": "中華醫事科技大學", "d": "寵物照護與美容科", "e": false, "m": 64.5, "z": 26.0, "j": 21.0, "f": 15.0, "k": 9.4, "n": false}, {"s": "馬偕醫護管理專科學校", "d": "生命關懷事業科", "e": false, "m": 64.5, "z": 26.0, "j": 21.0, "f": 15.0, "k": 5.6, "n": true}, {"s": "仁德醫護管理專科學校", "d": "餐旅管理科", "e": false, "m": 64.5, "z": 26.0, "j": 21.0, "f": 15.0, "k": 6.6, "n": false}, {"s": "樹人醫護管理專科學校", "d": "美容保健科", "e": false, "m": 64.5, "z": 26.0, "j": 21.0, "f": 14.5, "k": 6.6, "n": false}, {"s": "崇仁醫護管理專科學校", "d": "餐飲管理科", "e": false, "m": 64.5, "z": 26.0, "j": 21.0, "f": 15.0, "k": 5.2, "n": false}, {"s": "新生醫護管理專科學校", "d": "美容造型科", "e": false, "m": 64.5, "z": 26.0, "j": 21.0, "f": 15.0, "k": 6.6, "n": true}, {"s": "樹人醫護管理專科學校", "d": "應用日語科", "e": false, "m": 63.5, "z": 26.0, "j": 21.0, "f": 15.0, "k": 6.2, "n": false}, {"s": "樹人醫護管理專科學校", "d": "幼兒保育科", "e": false, "m": 63.5, "z": 26.0, "j": 21.0, "f": 15.0, "k": 5.4, "n": false}, {"s": "樹人醫護管理專科學校", "d": "醫學影像暨放射技術科", "e": false, "m": 63.5, "z": 26.0, "j": 21.0, "f": 15.0, "k": 0.0, "n": false}, {"s": "馬偕醫護管理專科學校", "d": "視光學科", "e": false, "m": 63.0, "z": 24.0, "j": 21.0, "f": 15.0, "k": 10.6, "n": true}, {"s": "南臺科技大學", "d": "資訊工程科", "e": false, "m": 62.0, "z": 26.0, "j": 21.0, "f": 15.0, "k": 8.4, "n": false}, {"s": "龍華科技大學", "d": "半導體工程科", "e": false, "m": 62.0, "z": 26.0, "j": 21.0, "f": 15.0, "k": 9.6, "n": false}, {"s": "龍華科技大學", "d": "電子工程科", "e": false, "m": 62.0, "z": 26.0, "j": 21.0, "f": 15.0, "k": 7.4, "n": false}, {"s": "龍華科技大學", "d": "電機工程科", "e": false, "m": 62.0, "z": 26.0, "j": 21.0, "f": 15.0, "k": 7.6, "n": false}, {"s": "中華醫事科技大學", "d": "幼兒保育科", "e": false, "m": 62.0, "z": 26.0, "j": 21.0, "f": 15.0, "k": 7.6, "n": false}, {"s": "中華科技大學", "d": "航空機械科", "e": false, "m": 62.0, "z": 26.0, "j": 21.0, "f": 15.0, "k": 9.6, "n": false}, {"s": "美和科技大學", "d": "餐旅管理科", "e": false, "m": 62.0, "z": 26.0, "j": 21.0, "f": 15.0, "k": 9.6, "n": false}, {"s": "臺北城市科技大學", "d": "應用外語科", "e": false, "m": 62.0, "z": 26.0, "j": 21.0, "f": 15.0, "k": 11.6, "n": true}, {"s": "宏國德霖科技大學", "d": "室內設計科", "e": false, "m": 62.0, "z": 26.0, "j": 21.0, "f": 15.0, "k": 10.6, "n": true}, {"s": "台北海洋科技大學", "d": "電競數位遊戲與動畫設計科", "e": false, "m": 62.0, "z": 26.0, "j": 21.0, "f": 15.0, "k": 11.4, "n": true}, {"s": "黎明技術學院", "d": "數位多媒體科", "e": false, "m": 62.0, "z": 26.0, "j": 21.0, "f": 15.0, "k": 16.6, "n": true}, {"s": "德育護理健康學院", "d": "美容流行設計科", "e": false, "m": 62.0, "z": 26.0, "j": 21.0, "f": 15.0, "k": 8.4, "n": true}, {"s": "馬偕醫護管理專科學校", "d": "幼兒保育科", "e": false, "m": 62.0, "z": 26.0, "j": 21.0, "f": 15.0, "k": 10.6, "n": true}, {"s": "馬偕醫護管理專科學校", "d": "餐飲管理科", "e": false, "m": 62.0, "z": 26.0, "j": 21.0, "f": 15.0, "k": 5.4, "n": true}, {"s": "馬偕醫護管理專科學校", "d": "化妝品應用與管理科", "e": false, "m": 62.0, "z": 26.0, "j": 21.0, "f": 15.0, "k": 12.6, "n": true}, {"s": "馬偕醫護管理專科學校", "d": "人工智慧暨醫療應用科", "e": false, "m": 62.0, "z": 26.0, "j": 21.0, "f": 15.0, "k": 12.6, "n": true}, {"s": "馬偕醫護管理專科學校", "d": "智慧科技長期照顧科", "e": false, "m": 62.0, "z": 26.0, "j": 21.0, "f": 15.0, "k": 8.4, "n": true}, {"s": "樹人醫護管理專科學校", "d": "應用英語科", "e": false, "m": 62.0, "z": 26.0, "j": 21.0, "f": 15.0, "k": 11.6, "n": false}, {"s": "樹人醫護管理專科學校", "d": "牙體技術科", "e": false, "m": 62.0, "z": 26.0, "j": 21.0, "f": 15.0, "k": 11.6, "n": false}, {"s": "耕莘健康管理專科學校", "d": "嬰幼兒保育科(新店校區)", "e": false, "m": 62.0, "z": 26.0, "j": 21.0, "f": 15.0, "k": 8.6, "n": true}, {"s": "耕莘健康管理專科學校", "d": "化妝品應用與管理科(新店校區)", "e": false, "m": 62.0, "z": 26.0, "j": 21.0, "f": 15.0, "k": 10.6, "n": true}, {"s": "耕莘健康管理專科學校", "d": "區)", "e": false, "m": 62.0, "z": 26.0, "j": 21.0, "f": 15.0, "k": 7.8, "n": true}, {"s": "敏惠醫護管理專科學校", "d": "美容保健科", "e": false, "m": 62.0, "z": 26.0, "j": 21.0, "f": 15.0, "k": 6.6, "n": false}, {"s": "新生醫護管理專科學校", "d": "視光學科", "e": false, "m": 62.0, "z": 26.0, "j": 21.0, "f": 15.0, "k": 9.4, "n": true}, {"s": "崇仁醫護管理專科學校", "d": "老人服務事業管理科", "e": false, "m": 61.25, "z": 26.0, "j": 21.0, "f": 14.25, "k": 6.4, "n": false}, {"s": "輔英科技大學", "d": "應用外語科", "e": false, "m": 61.0, "z": 25.0, "j": 21.0, "f": 15.0, "k": 11.6, "n": false}, {"s": "臺北城市科技大學", "d": "電機工程科", "e": false, "m": 61.0, "z": 26.0, "j": 21.0, "f": 12.5, "k": 7.6, "n": true}, {"s": "臺北城市科技大學", "d": "資訊工程科", "e": false, "m": 61.0, "z": 25.0, "j": 21.0, "f": 15.0, "k": 15.4, "n": true}, {"s": "台北海洋科技大學", "d": "餐飲管理科", "e": false, "m": 61.0, "z": 25.0, "j": 21.0, "f": 15.0, "k": 9.6, "n": true}, {"s": "仁德醫護管理專科學校", "d": "生技製藥經營管理科", "e": false, "m": 61.0, "z": 25.0, "j": 21.0, "f": 15.0, "k": 10.6, "n": false}, {"s": "育英醫護管理專科學校", "d": "化妝品應用與管理科", "e": false, "m": 61.0, "z": 26.0, "j": 21.0, "f": 11.5, "k": 8.6, "n": false}, {"s": "德育護理健康學院", "d": "護理科", "e": true, "m": 60.9, "z": 26.0, "j": 21.0, "f": 5.5, "k": 8.4, "n": true}, {"s": "龍華科技大學", "d": "機械工程科", "e": false, "m": 60.75, "z": 26.0, "j": 21.0, "f": 13.75, "k": 7.4, "n": false}, {"s": "中華醫事科技大學", "d": "食品營養科", "e": false, "m": 60.75, "z": 26.0, "j": 21.0, "f": 13.75, "k": 9.6, "n": false}, {"s": "美和科技大學", "d": "美容科保健造型設計組", "e": false, "m": 60.5, "z": 26.0, "j": 21.0, "f": 11.0, "k": 6.4, "n": false}, {"s": "敏惠醫護管理專科學校", "d": "長期照顧與健康促進管理科", "e": false, "m": 60.5, "z": 26.0, "j": 21.0, "f": 10.5, "k": 6.4, "n": false}, {"s": "臺北城市科技大學", "d": "餐飲事業科", "e": false, "m": 60.0, "z": 26.0, "j": 21.0, "f": 10.0, "k": 7.1, "n": true}, {"s": "台北海洋科技大學", "d": "海洋運動休閒與觀光管理科", "e": false, "m": 60.0, "z": 26.0, "j": 21.0, "f": 13.0, "k": 8.6, "n": true}, {"s": "仁德醫護管理專科學校", "d": "職業安全衛生科", "e": false, "m": 60.0, "z": 26.0, "j": 21.0, "f": 10.0, "k": 8.6, "n": false}, {"s": "聖母醫護管理專科學校", "d": "護理科", "e": true, "m": 60.0, "z": 26.0, "j": 21.0, "f": 10.5, "k": 0.0, "n": false}, {"s": "聖母醫護管理專科學校", "d": "牙體技術暨數位應用科", "e": false, "m": 59.5, "z": 26.0, "j": 21.0, "f": 12.5, "k": 12.6, "n": false}, {"s": "中華科技大學", "d": "電機與資訊工程科", "e": false, "m": 59.25, "z": 26.0, "j": 21.0, "f": 12.25, "k": 8.6, "n": false}, {"s": "南開科技大學", "d": "自動化工程科", "e": false, "m": 59.0, "z": 26.0, "j": 21.0, "f": 12.0, "k": 11.6, "n": false}, {"s": "宏國德霖科技大學", "d": "應用外語科", "e": false, "m": 59.0, "z": 23.0, "j": 21.0, "f": 15.0, "k": 10.6, "n": true}, {"s": "大仁科技大學", "d": "環境與職業安全衛生科", "e": false, "m": 58.75, "z": 25.0, "j": 21.0, "f": 12.75, "k": 10.6, "n": false}, {"s": "康寧大學(臺北校區)", "d": "", "e": false, "m": 58.75, "z": 25.0, "j": 21.0, "f": 12.75, "k": 13.6, "n": true}, {"s": "德育護理健康學院", "d": "餐旅廚藝管理科", "e": false, "m": 58.5, "z": 26.0, "j": 21.0, "f": 8.5, "k": 7.6, "n": true}, {"s": "宏國德霖科技大學", "d": "資訊工程科", "e": false, "m": 58.25, "z": 26.0, "j": 21.0, "f": 11.25, "k": 8.6, "n": true}, {"s": "仁德醫護管理專科學校", "d": "口腔衛生學科", "e": false, "m": 58.25, "z": 24.0, "j": 21.0, "f": 13.25, "k": 7.4, "n": false}, {"s": "中華醫事科技大學", "d": "醫學檢驗生物技術科", "e": false, "m": 58.0, "z": 22.0, "j": 21.0, "f": 15.0, "k": 11.6, "n": false}, {"s": "慈惠醫護管理專科學校", "d": "美容造型設計科", "e": false, "m": 58.0, "z": 22.0, "j": 21.0, "f": 15.0, "k": 8.8, "n": false}, {"s": "慈惠醫護管理專科學校", "d": "護理科", "e": true, "m": 57.9, "z": 26.0, "j": 21.0, "f": 3.5, "k": 7.4, "n": false}, {"s": "慈惠醫護管理專科學校", "d": "數位媒體創意設計科", "e": false, "m": 57.5, "z": 26.0, "j": 21.0, "f": 9.0, "k": 8.6, "n": false}, {"s": "慈惠醫護管理專科學校", "d": "幼兒保育科", "e": false, "m": 57.5, "z": 26.0, "j": 21.0, "f": 10.5, "k": 6.6, "n": false}, {"s": "樹人醫護管理專科學校", "d": "口腔衛生學科", "e": false, "m": 57.0, "z": 26.0, "j": 21.0, "f": 10.0, "k": 5.6, "n": false}, {"s": "新生醫護管理專科學校", "d": "口腔衛生學科", "e": false, "m": 56.75, "z": 26.0, "j": 21.0, "f": 9.75, "k": 0.0, "n": true}, {"s": "敏惠醫護管理專科學校", "d": "護理科", "e": true, "m": 56.6, "z": 26.0, "j": 21.0, "f": 2.0, "k": 7.6, "n": false}, {"s": "中華科技大學", "d": "建築科", "e": false, "m": 56.5, "z": 25.0, "j": 21.0, "f": 8.0, "k": 6.4, "n": false}, {"s": "耕莘健康管理專科學校", "d": "健康餐旅科(宜蘭校區)", "e": false, "m": 56.5, "z": 26.0, "j": 21.0, "f": 9.5, "k": 7.4, "n": true}, {"s": "新生醫護管理專科學校", "d": "幼兒保育科", "e": false, "m": 56.5, "z": 26.0, "j": 21.0, "f": 6.5, "k": 5.4, "n": true}, {"s": "聖母醫護管理專科學校", "d": "幼兒保育科", "e": false, "m": 56.25, "z": 26.0, "j": 21.0, "f": 9.25, "k": 5.6, "n": false}, {"s": "敏惠醫護管理專科學校", "d": "牙體技術科", "e": false, "m": 56.0, "z": 26.0, "j": 21.0, "f": 6.0, "k": 6.4, "n": false}, {"s": "美和科技大學", "d": "觀光科", "e": false, "m": 55.75, "z": 26.0, "j": 21.0, "f": 6.25, "k": 5.2, "n": false}, {"s": "正修科技大學", "d": "土木工程科", "e": true, "m": 55.5, "z": 26.0, "j": 7.0, "f": 15.0, "k": 6.0, "n": false}, {"s": "大仁科技大學", "d": "多媒體設計科", "e": false, "m": 55.5, "z": 26.0, "j": 21.0, "f": 8.5, "k": 11.4, "n": false}, {"s": "崇仁醫護管理專科學校", "d": "美容保健科", "e": false, "m": 55.5, "z": 26.0, "j": 21.0, "f": 8.5, "k": 7.4, "n": false}, {"s": "美和科技大學", "d": "護理科", "e": true, "m": 55.1, "z": 26.0, "j": 21.0, "f": 0.0, "k": 5.6, "n": false}, {"s": "中華醫事科技大學", "d": "醫務暨健康事業管理科", "e": false, "m": 55.0, "z": 23.0, "j": 21.0, "f": 11.0, "k": 13.6, "n": false}, {"s": "中華醫事科技大學", "d": "製藥工程科", "e": false, "m": 55.0, "z": 26.0, "j": 14.0, "f": 15.0, "k": 0.0, "n": false}, {"s": "聖母醫護管理專科學校", "d": "餐旅與休閒遊憩管理科", "e": false, "m": 55.0, "z": 26.0, "j": 21.0, "f": 8.0, "k": 7.6, "n": false}, {"s": "聖母醫護管理專科學校", "d": "化妝品應用與管理科", "e": false, "m": 55.0, "z": 26.0, "j": 21.0, "f": 8.0, "k": 7.0, "n": false}, {"s": "康寧大學(臺北校區)", "d": "", "e": false, "m": 55.0, "z": 26.0, "j": 21.0, "f": 5.0, "k": 5.6, "n": true}, {"s": "仁德醫護管理專科學校", "d": "視光學科", "e": false, "m": 54.5, "z": 26.0, "j": 21.0, "f": 7.5, "k": 5.4, "n": false}, {"s": "樹人醫護管理專科學校", "d": "視光學科", "e": false, "m": 54.5, "z": 26.0, "j": 21.0, "f": 5.0, "k": 7.4, "n": false}, {"s": "育英醫護管理專科學校", "d": "老人健康服務事業管理科", "e": false, "m": 54.25, "z": 26.0, "j": 21.0, "f": 4.25, "k": 6.6, "n": false}, {"s": "美和科技大學", "d": "美容科寵物美容設計組", "e": false, "m": 53.75, "z": 25.0, "j": 21.0, "f": 7.75, "k": 12.8, "n": false}, {"s": "美和科技大學", "d": "口腔衛生學科", "e": false, "m": 53.75, "z": 26.0, "j": 21.0, "f": 6.75, "k": 7.2, "n": false}, {"s": "宏國德霖科技大學", "d": "土木工程科", "e": false, "m": 53.5, "z": 24.0, "j": 21.0, "f": 8.5, "k": 10.6, "n": true}, {"s": "黎明技術學院", "d": "電機工程科", "e": false, "m": 53.5, "z": 25.0, "j": 21.0, "f": 7.5, "k": 9.6, "n": true}, {"s": "仁德醫護管理專科學校", "d": "醫事檢驗科", "e": false, "m": 52.25, "z": 26.0, "j": 21.0, "f": 5.25, "k": 9.4, "n": false}, {"s": "樹人醫護管理專科學校", "d": "護理科", "e": true, "m": 52.25, "z": 26.0, "j": 21.0, "f": 5.25, "k": 0.0, "n": false}, {"s": "仁德醫護管理專科學校", "d": "生命關懷事業科", "e": false, "m": 52.0, "z": 25.0, "j": 21.0, "f": 6.0, "k": 9.4, "n": false}, {"s": "康寧大學(臺北校區)", "d": "", "e": false, "m": 52.0, "z": 26.0, "j": 14.0, "f": 12.0, "k": 7.4, "n": true}, {"s": "康寧大學(臺北校區)", "d": "", "e": false, "m": 52.0, "z": 26.0, "j": 7.0, "f": 15.0, "k": 5.0, "n": true}, {"s": "慈濟大學", "d": "", "e": true, "m": 51.6, "z": 26.0, "j": 14.0, "f": 4.0, "k": 7.6, "n": false}, {"s": "中華醫事科技大學", "d": "職業安全衛生科", "e": false, "m": 51.5, "z": 26.0, "j": 21.0, "f": 4.5, "k": 5.0, "n": false}, {"s": "南開科技大學", "d": "電機與資訊技術科", "e": false, "m": 51.5, "z": 26.0, "j": 21.0, "f": 4.5, "k": 23.6, "n": false}, {"s": "美和科技大學", "d": "食品營養科", "e": false, "m": 51.0, "z": 26.0, "j": 21.0, "f": 4.0, "k": 6.6, "n": false}, {"s": "崇仁醫護管理專科學校", "d": "護理科", "e": true, "m": 51.0, "z": 26.0, "j": 21.0, "f": 4.0, "k": 0.0, "n": false}, {"s": "慈惠醫護管理專科學校", "d": "餐飲管理科", "e": false, "m": 50.0, "z": 26.0, "j": 21.0, "f": 3.0, "k": 5.0, "n": false}, {"s": "新生醫護管理專科學校", "d": "醫藥保健商務科", "e": false, "m": 49.75, "z": 25.0, "j": 14.0, "f": 7.75, "k": 0.0, "n": true}, {"s": "輔英科技大學", "d": "環境工程與科學科", "e": false, "m": 49.0, "z": 21.0, "j": 21.0, "f": 7.0, "k": 10.2, "n": false}, {"s": "中華醫事科技大學", "d": "視光科", "e": false, "m": 48.5, "z": 24.0, "j": 21.0, "f": 3.5, "k": 11.6, "n": false}, {"s": "南臺科技大學", "d": "機械工程科", "e": false, "m": 48.0, "z": 21.0, "j": 21.0, "f": 6.0, "k": 13.4, "n": false}, {"s": "新生醫護管理專科學校", "d": "健康休閒管理科", "e": false, "m": 47.5, "z": 26.0, "j": 21.0, "f": 0.5, "k": 5.1, "n": true}, {"s": "樹人醫護管理專科學校", "d": "資訊管理科", "e": false, "m": 47.0, "z": 26.0, "j": 21.0, "f": 0.0, "k": 7.2, "n": false}, {"s": "崇仁醫護管理專科學校", "d": "應用外語科", "e": false, "m": 46.0, "z": 25.0, "j": 21.0, "f": 0.0, "k": 8.2, "n": false}, {"s": "仁德醫護管理專科學校", "d": "護理科", "e": true, "m": 45.45, "z": 26.0, "j": 14.0, "f": 1.25, "k": 4.2, "n": false}, {"s": "大仁科技大學", "d": "寵物照護暨美容科", "e": false, "m": 45.0, "z": 24.0, "j": 21.0, "f": 0.0, "k": 0.0, "n": false}, {"s": "南臺科技大學", "d": "化學工程與材料工程科", "e": false, "m": 41.0, "z": 26.0, "j": 0.0, "f": 15.0, "k": 11.6, "n": false}, {"s": "敏惠醫護管理專科學校", "d": "幼兒保育科", "e": false, "m": 40.0, "z": 25.0, "j": 0.0, "f": 15.0, "k": 5.4, "n": false}, {"s": "仁德醫護管理專科學校", "d": "復健科", "e": false, "m": 39.75, "z": 26.0, "j": 0.0, "f": 13.75, "k": 7.6, "n": false}, {"s": "宏國德霖科技大學", "d": "餐旅管理科", "e": false, "m": 37.75, "z": 24.0, "j": 7.0, "f": 6.75, "k": 9.4, "n": true}, {"s": "耕莘健康管理專科學校", "d": "護理科(宜蘭校區)", "e": true, "m": 37.4, "z": 25.0, "j": 0.0, "f": 3.0, "k": 9.4, "n": true}, {"s": "慈惠醫護管理專科學校", "d": "物理治療科", "e": false, "m": 35.75, "z": 26.0, "j": 0.0, "f": 9.75, "k": 0.0, "n": false}, {"s": "德育護理健康學院", "d": "幼兒保育科", "e": false, "m": 34.75, "z": 26.0, "j": 7.0, "f": 1.75, "k": 6.2, "n": true}, {"s": "正修科技大學", "d": "建築科", "e": true, "m": 34.6, "z": 26.0, "j": 0.0, "f": 2.0, "k": 6.6, "n": false}, {"s": "新生醫護管理專科學校", "d": "護理科", "e": true, "m": 28.5, "z": 26.0, "j": 0.0, "f": 2.5, "k": 0.0, "n": true}, {"s": "康寧大學(臺北校區)", "d": "", "e": false, "m": 26.5, "z": 26.0, "j": 0.0, "f": 0.5, "k": 11.2, "n": true}, {"s": "仁德醫護管理專科學校", "d": "人工智慧暨醫療應用科", "e": false, "m": 26.0, "z": 26.0, "j": 0.0, "f": 0.0, "k": 0.0, "n": false}, {"s": "育英醫護管理專科學校", "d": "護理科", "e": true, "m": 26.0, "z": 26.0, "j": 0.0, "f": 0.0, "k": 0.0, "n": false}, {"s": "宏國德霖科技大學", "d": "機械工程科", "e": false, "m": 25.0, "z": 25.0, "j": 0.0, "f": 0.0, "k": 17.4, "n": true}, {"s": "南臺科技大學", "d": "電子工程科", "e": false, "m": 24.0, "z": 24.0, "j": 0.0, "f": 0.0, "k": 0.0, "n": false}];
+
+/* ---- conversion tables ---- */
+const SUBJECTS=[["國","國文"],["英","英語"],["數","數學"],["社","社會"],["自","自然"]];
+const GRADES=["A++","A+","A","B++","B+","B","C"];
+const JB_PTS={ "A++":7,"A+":6,"A":5,"B++":4,"B+":3,"B":2,"C":1 };
+const WU_PTS={ "A++":6,"A+":5,"A":4,"B++":3,"B+":2,"B":1,"C":0 };
+const WRITE_PTS={6:1,5:0.8,4:0.6,3:0.4,2:0.2,1:0.1};
+const VOL_PTS=[36,36,36,36,36,35,35,35,35,35,34,34,34,34,34,33,33,33,33,33,32,32,32,32,32,32,32,32,32,32];
+
+let state={ grades:{國:null,英:null,數:null,社:null,自:null}, write:null, mode:"jb",
+            filters:{region:"all",pub:"all",type:"all",q:""}, voljb:[], volwu:[] };
+
+/* ---- score calc ---- */
+function jbScore(){
+  let pts=0; for(const k in state.grades){ if(!state.grades[k]) return null; pts+=JB_PTS[state.grades[k]]; }
+  if(!state.write) return null; pts+=WRITE_PTS[state.write];
+  return Math.round(pts*10)/10;
+}
+function wuScore(){
+  let pts=0; for(const k in state.grades){ if(!state.grades[k]) return null; pts+=WU_PTS[state.grades[k]]; }
+  if(!state.write) return null; pts+=WRITE_PTS[state.write];
+  return Math.round(pts*10)/10;
+}
+function ready(){ return jbScore()!==null; }
+
+/* ---- status classification ---- */
+function classify(mine, cut){
+  if(mine===null||cut===null||cut===undefined) return {k:"na",t:"待輸入"};
+  const g=mine-cut;
+  if(g>=3) return {k:"safe",t:"安全 +"+g.toFixed(1)};
+  if(g>=0.5) return {k:"steady",t:"穩當 +"+g.toFixed(1)};
+  if(g>=-2) return {k:"reach",t:(g>=0?"挑戰 +":"挑戰 ")+g.toFixed(1)};
+  return {k:"dream",t:"夢幻 "+g.toFixed(1)};
+}
+const RANK={safe:3,steady:2,reach:1,dream:0};
+
+/* item helpers */
+function jbCut(it){ return it.y[1]!=null?it.y[1]:it.y[0]; }
+function jbCutYear(it){ return it.y[1]!=null?115:114; }
+function trendStr(it){
+  const a=it.y[0],c=it.y[1];
+  if(a==null||c==null) return "";
+  const d=c-a;
+  if(Math.abs(d)<0.05) return "→ 持平";
+  return (d>0?"↑ 升 ":"↓ 降 ")+Math.abs(d).toFixed(1);
+}
+function uid(it,mode){ return (mode||state.mode)+"|"+it.s+"|"+it.d; }
+
+/* ---- render grade input ---- */
+function renderGrades(){
+  const box=document.getElementById("gradeRows"); box.innerHTML="";
+  SUBJECTS.forEach(([k,full])=>{
+    const row=document.createElement("div"); row.className="grow";
+    row.innerHTML=`<div class="glab">${full}<small>${k}</small></div>`;
+    const segs=document.createElement("div"); segs.className="segs";
+    GRADES.forEach(g=>{
+      const b=document.createElement("div"); b.className="seg"+(state.grades[k]===g?" on":""); b.textContent=g;
+      b.onclick=()=>{ state.grades[k]= state.grades[k]===g?null:g; renderGrades(); updateAll(); };
+      segs.appendChild(b);
+    });
+    row.appendChild(segs); box.appendChild(row);
+  });
+  // writing
+  const row=document.createElement("div"); row.className="grow";
+  row.innerHTML=`<div class="glab">寫作<small>級分</small></div>`;
+  const segs=document.createElement("div"); segs.className="segs";
+  [6,5,4,3,2,1].forEach(n=>{
+    const b=document.createElement("div"); b.className="seg w"+(state.write===n?" on":""); b.textContent=n;
+    b.onclick=()=>{ state.write= state.write===n?null:n; renderGrades(); updateAll(); };
+    segs.appendChild(b);
+  });
+  row.appendChild(segs); box.appendChild(row);
+}
+
+/* ---- score bar ---- */
+let lastJB=null,lastWU=null;
+function animateNum(el,from,to){
+  if(to===null){ el.textContent="—"; el.classList.add("dim"); return; }
+  el.classList.remove("dim");
+  from=(from===null)?0:from; const start=performance.now(),dur=420;
+  function tick(now){ const p=Math.min(1,(now-start)/dur); const e=1-Math.pow(1-p,3);
+    el.textContent=(from+(to-from)*e).toFixed(1); if(p<1)requestAnimationFrame(tick); else el.textContent=to.toFixed(1); }
+  requestAnimationFrame(tick);
+}
+function renderScoreBar(){
+  const jb=jbScore(),wu=wuScore();
+  animateNum(document.getElementById("sbJB"),lastJB,jb);
+  animateNum(document.getElementById("sbWU"),lastWU,wu);
+  lastJB=jb;lastWU=wu;
+  const hint=document.getElementById("sbHint");
+  if(jb===null){ hint.innerHTML="↓ 先在下方輸入 <b>5 科會考等級 + 寫作級分</b>"; }
+  else{
+    const cmp = state.mode==="jb"
+      ? `你的基北積分 <b style="color:var(--accent)">${jb}</b>，相當於約 5A ${jb>=33?'頂標':jb>=27?'前段':jb>=20?'中前段':'中後段'}`
+      : `五專會考成績 <b style="color:var(--coral)">${wu}</b>，下方依此比較各科組`;
+    hint.innerHTML="✓ "+cmp;
+  }
+}
+
+/* ---- filters ---- */
+function buildFilters(){
+  const f=document.getElementById("filters"); f.innerHTML="";
+  const search=document.createElement("input"); search.className="search"; search.placeholder="搜尋學校 / 科系 …";
+  search.value=state.filters.q;
+  search.oninput=e=>{ state.filters.q=e.target.value.trim(); renderList(); };
+  f.appendChild(search);
+  function group(key,opts){
+    const wrap=document.createElement("div"); wrap.className="chips";
+    opts.forEach(([val,lab])=>{
+      const c=document.createElement("div"); c.className="fchip"+(state.filters[key]===val?" on":""); c.textContent=lab;
+      c.onclick=()=>{ state.filters[key]=val; buildFilters(); renderList(); };
+      wrap.appendChild(c);
+    });
+    f.appendChild(wrap);
+  }
+  if(state.mode==="jb"){
+    group("region",[["all","全區"],["北市","台北"],["新北","新北"],["基隆","基隆"]]);
+    group("pub",[["all","公私"],["公","公立"],["私","私立"]]);
+    group("type",[["all","全部"],["高中","普高"],["高職","高職"],["綜高","綜高"]]);
+  }else{
+    group("region",[["all","全部"],["north","北北基校區"]]);
+  }
+}
+
+/* ---- list ---- */
+function currentData(){ return state.mode==="jb"?JB_DATA:WU_DATA; }
+function inVol(it){ const arr=state.mode==="jb"?state.voljb:state.volwu; return arr.some(v=>uid(v)===uid(it)); }
+function filtered(){
+  const q=state.filters.q;
+  if(state.mode==="jb"){
+    let d=JB_DATA.filter(it=>{
+      if(state.filters.region!=="all"&&it.r!==state.filters.region) return false;
+      if(state.filters.pub!=="all"&&it.p!==state.filters.pub) return false;
+      if(state.filters.type!=="all"&&it.t!==state.filters.type) return false;
+      if(q&&!(it.s+it.d).includes(q)) return false;
+      return jbCut(it)!=null;
+    });
+    d.sort((a,b)=>jbCut(b)-jbCut(a));
+    return d;
+  }else{
+    let d=WU_DATA.filter(it=>{
+      if(state.filters.region==="north"&&!it.n) return false;
+      if(q&&!(it.s+it.d).includes(q)) return false;
+      return true;
+    });
+    d.sort((a,b)=>b.m-a.m);
+    return d;
+  }
+}
+function renderList(){
+  const list=document.getElementById("list"); list.innerHTML="";
+  const data=filtered();
+  document.getElementById("listCount").innerHTML = `共 <b>${data.length}</b> 個校科　·　依最低積分高→低`;
+  if(!data.length){ list.innerHTML=`<div class="empty">找不到符合條件的校科，換個篩選看看 🔍</div>`; return; }
+  const mineJB=jbScore(), mineWU=wuScore();
+  data.forEach(it=>{
+    const row=document.createElement("div"); row.className="row";
+    const star=document.createElement("div"); star.className="star"+(inVol(it)?" added":""); star.textContent=inVol(it)?"★":"☆";
+    star.title=inVol(it)?"移出志願表":"加入志願表";
+    star.onclick=()=>toggleVol(it);
+    row.appendChild(star);
+
+    const main=document.createElement("div"); main.className="r-main";
+    if(state.mode==="jb"){
+      const cut=jbCut(it), st=classify(mineJB,cut);
+      main.innerHTML=`<div class="r-name">${it.s}<span class="dept">${it.d}</span></div>
+        <div class="r-meta">
+          <span class="tag">${it.r}</span>
+          <span class="tag ${it.p==='公'?'pub':'pri'}">${it.p}立</span>
+          <span class="tag">${it.t}</span>
+          <span class="tag">${trendStr(it)}</span>
+        </div>`;
+      const right=document.createElement("div"); right.className="r-right";
+      right.innerHTML=`<div class="cut">${cut}<span class="u">/36</span></div>
+        <div class="trend">114→115：${it.y.map(v=>v==null?'–':v).join(' · ')}</div>
+        <span class="stat ${st.k}">${st.t}</span>`;
+      row.appendChild(main); row.appendChild(right);
+    }else{
+      const st=classify(mineWU,it.k);
+      main.innerHTML=`<div class="r-name">${it.s}<span class="dept">${it.d}</span></div>
+        <div class="r-meta">
+          ${it.n?'<span class="tag pub">北北基校區</span>':''}
+          <span class="tag">${it.e?'採會考':'未採會考'}</span>
+          <span class="tag">會考門檻 ${it.k}</span>
+        </div>`;
+      const right=document.createElement("div"); right.className="r-right";
+      right.innerHTML=`<div class="cut">${it.m}<span class="u">/108</span></div>
+        <div class="trend">會考成績比較</div>
+        <span class="stat ${st.k}">${st.t}</span>`;
+      row.appendChild(main); row.appendChild(right);
+    }
+    list.appendChild(row);
+  });
+}
+
+/* ---- volunteer list ops ---- */
+function curVol(){ return state.mode==="jb"?state.voljb:state.volwu; }
+function toggleVol(it){
+  const arr=curVol(); const i=arr.findIndex(v=>uid(v)===uid(it));
+  if(i>=0) arr.splice(i,1); else { if(arr.length>=30){ alert("志願最多 30 個喔"); return;} arr.push(it); }
+  renderList(); renderVol();
+}
+function moveVol(idx,dir){ const arr=curVol(); const j=idx+dir; if(j<0||j>=arr.length)return;
+  [arr[idx],arr[j]]=[arr[j],arr[idx]]; renderVol(); }
+function delVol(idx){ curVol().splice(idx,1); renderList(); renderVol(); }
+
+function renderVol(){
+  const arr=curVol();
+  document.getElementById("vCnt").textContent=`(${arr.length})`;
+  const vlist=document.getElementById("vlist");
+  const placeBox=document.getElementById("placement");
+  const mineJB=jbScore(), mineWU=wuScore();
+  const mine = state.mode==="jb"?mineJB:mineWU;
+
+  // placement simulation: first reachable choice in order
+  let placedIdx=-1;
+  if(mine!==null){
+    for(let i=0;i<arr.length;i++){
+      const cut = state.mode==="jb"?jbCut(arr[i]):arr[i].k;
+      if(mine>=cut){ placedIdx=i; break; }
+    }
+  }
+  // placement banner
+  if(!arr.length){ placeBox.innerHTML=""; }
+  else if(mine===null){
+    placeBox.innerHTML=`<div class="placement"><div class="pl-lab">模擬分發結果</div>
+      <div class="pl-name" style="color:var(--ink2)">先輸入會考成績</div>
+      <div class="pl-sub">填好成績後，這裡會依你的志願順序預測落點。</div></div>`;
+  }else if(placedIdx>=0){
+    const it=arr[placedIdx];
+    placeBox.innerHTML=`<div class="placement hit"><div class="pl-lab">🎓 模擬分發結果（依目前志願順序）</div>
+      <div class="pl-name">第 ${placedIdx+1} 志願 · ${it.s} ${it.d}</div>
+      <div class="pl-sub">你的成績達到此校科近年門檻，且排在更前面的志願暫時搆不到，故分發至此。<br>想衝更前面？把更難的志願往上排即可——分發只會給「搆得到的最前面那一個」。</div></div>`;
+  }else{
+    placeBox.innerHTML=`<div class="placement miss"><div class="pl-lab">⚠️ 模擬分發結果</div>
+      <div class="pl-name">目前順序下可能落榜</div>
+      <div class="pl-sub">志願表裡沒有任何一個校科的門檻在你成績之內。建議補上 1–2 個「安全 / 穩當」志願墊底。</div></div>`;
+  }
+
+  // list
+  vlist.innerHTML="";
+  if(!arr.length){ vlist.innerHTML=`<div class="vempty">還沒有志願。<br>到左邊點 <b style="color:var(--gold)">☆</b> 把想念的校科加進來，<br>再拖動順序排兵布陣。</div>`;
+    document.getElementById("diagCard").style.display="none"; return; }
+  arr.forEach((it,i)=>{
+    const cut = state.mode==="jb"?jbCut(it):it.k;
+    const st = classify(mine, cut);
+    const v=document.createElement("div"); v.className="vitem"+(i===placedIdx?" placed":"");
+    v.innerHTML=`<div class="vrank">${i+1}</div>
+      <div class="vinfo"><div class="vn">${it.s}</div><div class="vd">${it.d} ·
+        ${state.mode==='jb'?('門檻 '+cut+' · 志願序積分 '+VOL_PTS[i]):('會考門檻 '+cut+' · 標準 '+it.m)}</div></div>
+      <span class="vstat stat ${st.k}">${st.t}</span>`;
+    const mv=document.createElement("div"); mv.className="vmove";
+    const up=document.createElement("button"); up.textContent="▲"; up.onclick=()=>moveVol(i,-1);
+    const dn=document.createElement("button"); dn.textContent="▼"; dn.onclick=()=>moveVol(i,1);
+    mv.appendChild(up); mv.appendChild(dn); v.appendChild(mv);
+    const del=document.createElement("button"); del.className="vdel"; del.textContent="×"; del.onclick=()=>delVol(i);
+    v.appendChild(del);
+    vlist.appendChild(v);
+  });
+  renderDiag(arr,mine);
+}
+
+/* ---- diagnosis ---- */
+let confettiShown=false;
+function renderDiag(arr,mine){
+  const card=document.getElementById("diagCard");
+  if(!arr.length||mine===null){ card.style.display="none"; return; }
+  card.style.display="block";
+  const cnt={safe:0,steady:0,reach:0,dream:0};
+  arr.forEach(it=>{ const cut=state.mode==="jb"?jbCut(it):it.k; cnt[classify(mine,cut).k]++; });
+  const total=arr.length;
+  const bar=document.getElementById("diagBar"); bar.innerHTML="";
+  [["safe","var(--safe)"],["steady","var(--steady)"],["reach","var(--reach)"],["dream","var(--dream)"]].forEach(([k,c])=>{
+    if(cnt[k]){ const i=document.createElement("i"); i.style.background=c; i.style.width=(cnt[k]/total*100)+"%"; bar.appendChild(i);} });
+  const reachy=cnt.reach+cnt.dream, safey=cnt.safe+cnt.steady;
+  let badge,tip;
+  if(safey===0){ badge="🔥 全衝刺型"; tip="你的志願全是挑戰與夢幻——很有膽識，但風險偏高。<b>建議至少加 2 個「穩當／安全」志願墊底</b>，免得分發落空。"; }
+  else if(reachy===0){ badge="🛡️ 保守穩健型"; tip="全部都是搆得到的志願，落點很安全。如果還有想拚的學校，<b>不妨在最前面放 1–2 個夢幻志願</b>，反正分發只取搆得到的最前面那個，往上放不吃虧。"; }
+  else if(reachy>=1&&safey>=1){ badge="⚖️ 攻守兼備"; tip="夢幻／挑戰在前、穩當／安全在後，這是健康的志願結構 👍 記得：<b>越想念的放越前面</b>，系統會分發到你搆得到的最前面那一個。"; }
+  else { badge="🧭 持續調整中"; tip="繼續加入校科，平衡一下挑戰與安全的比例。"; }
+  // ordering sanity: are dreams above safes?
+  let firstSafe=arr.findIndex(it=>{const c=state.mode==="jb"?jbCut(it):it.k;return RANK[classify(mine,c).k]>=2;});
+  let lastReach=-1; arr.forEach((it,i)=>{const c=state.mode==="jb"?jbCut(it):it.k;if(RANK[classify(mine,c).k]<=1)lastReach=i;});
+  if(firstSafe>=0&&lastReach>firstSafe){ tip+="<br>📌 提醒：你把部分<b>挑戰／夢幻志願排在安全志願後面</b>了。把它們往上移，才有機會分發到更好的選擇。"; }
+  document.getElementById("diagBadge").innerHTML=badge;
+  document.getElementById("diagTip").innerHTML=tip;
+  if(badge.includes("攻守兼備")&&!confettiShown){ confettiShown=true; confetti(); }
+  if(!badge.includes("攻守兼備")) confettiShown=false;
+}
+function confetti(){
+  const cols=["#1F9D6B","#DC5B38","#C2902B","#2C7FB8"];
+  for(let i=0;i<60;i++){ const d=document.createElement("div"); d.className="confetti";
+    d.style.left=Math.random()*100+"vw"; d.style.background=cols[i%4];
+    d.style.animation=`drop ${1+Math.random()*1.2}s ${Math.random()*.4}s linear forwards`;
+    d.style.transform=`rotate(${Math.random()*360}deg)`; document.body.appendChild(d);
+    setTimeout(()=>d.remove(),2600); }
+}
+
+/* ---- note ---- */
+function renderNote(){
+  const n=document.getElementById("note");
+  if(state.mode==="jb"){
+    n.innerHTML=`<b>關於基北會考積分（滿分 36）：</b>國英數社自每科 A++=7、A+=6、A=5、B++=4、B+=3、B=2、C=1（5 科上限 35），寫作 6 級=1、5=0.8、4=0.6、3=0.4、2=0.2、1=0.1。<br>
+    <b>比序順次：</b>總積分（志願序＋多元學習＋會考）→ 多元學習 → 會考積分 → 志願序。多數學生多元學習都拉滿，因此<b>會考積分是最關鍵的落點門檻</b>，本工具即以各校科公告的「最低錄取會考積分」做比較。<br>
+    <b>分發邏輯：</b>每人依志願序錄取 1 個校科，會被分發到「總積分足夠、且排序最前面」的志願——所以<b>越想念的放越前面</b>。<br>
+    ⚠️ 資料為官方「基北免會考最低錄取積分」總表（114、115 兩年，公私立高中／綜高／高職分科）。此為永中、福中、中山三校學生資料統計，<b>不代表各校科真正最低錄取積分</b>；每年志願序不同會影響錄取順序，數字僅供參考，請以當年官方簡章與放榜為準。各項資料不含特殊生升學優待。`;
+  }else{
+    n.innerHTML=`<b>關於五專優免：</b>最低錄取標準（滿分 108）＝ 均衡學習＋技藝優良＋志願積分＋弱勢身分＋服務學習＋競賽積分＋會考成績。<br>
+    <b>會考成績換算：</b>國英數社自每科 A++=6、A+=5、A=4、B++=3、B+=2、B=1、C=0（上限 30）＋寫作 0.1–1。<br>
+    本工具以你的<b>會考成績</b> 對比各科組在最低錄取標準時的「會考成績門檻」做落點估計——這假設你的<b>均衡學習、服務學習已接近上限、且該科組排在較前志願</b>（多數申請者如此）。其餘比序項目（技藝、競賽、弱勢加分）會再墊高總分。<br>
+    ⚠️ 數字為 114 學年資料，僅供參考；五專為全國統一分發，實際結果以官方放榜為準。`;
+  }
+}
+
+/* ---- tabs / update ---- */
+function updateAll(){ renderScoreBar(); renderList(); renderVol(); renderNote(); }
+document.querySelectorAll(".tab").forEach(t=>{
+  t.onclick=()=>{ document.querySelectorAll(".tab").forEach(x=>x.classList.remove("on")); t.classList.add("on");
+    state.mode=t.dataset.mode; state.filters={region:"all",pub:"all",type:"all",q:""}; confettiShown=false;
+    buildFilters(); updateAll(); };
+});
+document.getElementById("btnDemo").onclick=()=>{
+  state.grades={國:"B++",英:"A",數:"B+",社:"A",自:"B++"}; state.write=4;
+  renderGrades(); updateAll();
+};
+document.getElementById("btnClear").onclick=()=>{
+  state.grades={國:null,英:null,數:null,社:null,自:null}; state.write=null;
+  renderGrades(); updateAll();
+};
+
+/* init */
+renderGrades(); buildFilters(); updateAll();
+</script>
+</body>
+</html>
